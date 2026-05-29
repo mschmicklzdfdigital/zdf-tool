@@ -15,15 +15,6 @@ st.set_page_config(
 )
 
 # =========================================================
-# HARDCODED ORIGINAL LOGOS (BASE64 - NO LOADING ERRORS)
-# =========================================================
-# Original ZDFheute Wortmarke (Optimiert für dunklen Hintergrund)
-LOGO_ZDF_HEUTE = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyOTAgNjUiIGZpbGw9Im5vbmUiPjxwYXRoIGQ9Ik0yNSA0N0g1VjQxTDIwIDE3SDZWMTFINjRWMTdMMzMgNDFINjRWMzdIMjVaIiBmaWxsPSIjRkY1QTAwIi8+PHBhdGggZD0iTTc4IDExaDE2djM2SDc4VjExWiIgZmlsbD0iI0ZGNUEwMCIvPjxwYXRoIGQ9Ik0xMTAgMTFoMTZ2MThoMTZWMTloMTZ2MjhIMTU4VjExWiIgZmlsbD0iI0ZGNUEwMCIvPjxSZWN0IHg9Ijc4IiB5PSI1NSIgd2lkdGg9Ijg0IiBoZWlnaHQ9IjgiIGZpbGw9IiNGRjVBMDAiLz48dGV4dCB4PSIxNzUiIHk9IjQzIiBmaWxsPSIjRkZGRkZGIiBmb250LWZhbWlseT0iJ0ludGVyJywgc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjgwMCIgZm9udC1zaXplPSIzNiI+aGV1dGU8L3RleHQ+PC9zdmc+"
-
-# Original ZDF Digital Logo
-LOGO_ZDF_DIGITAL = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MDAgOTAiIGZpbGw9Im5vbmUiPjYyY2lyY2xlIGN4PSI0NSIgY3k9IjQ1IiByPSI0NSIgZmlsbD0iI0ZGNUEwMCIvPjxwYXRoIGQ9Ik0zMCAzNWgyMHY4SDMwVjM1WiIgZmlsbD0id2hpdGUiLz48dGV4dCB4PSIxMDUiIHk9IjUyIiBmaWxsPSIjRkZGRkZGIiBmb250LWZhbWlseT0iJ0ludGVyJywgc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjgwMCIgZm9udC1zaXplPSIzNCI+MkRGPC90ZXh0Pjx0ZXh0IHg9IjE5NSIgeT0iNTIiIGZpbGw9IiM5NEEzQjgiIGZvbnQtZmFtaWx5PSInSW50ZXInLCBzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iNzAwIiBmb250LXNpemU9IjM0Ij5ESUdJVEFMPC90ZXh0Pjwvc3ZnPg="
-
-# =========================================================
 # BRAND THEME & MAX CONTRAST LIGHTING
 # =========================================================
 ui_styles = """
@@ -35,7 +26,7 @@ ui_styles = """
     color: #ffffff !important;
     font-family: 'Inter', sans-serif !important;
 }
-/* Maximale Lesbarkeit für hochgeladene Texte und Tabellen */
+/* Maximale Lesbarkeit für alle Basistexte */
 p, li, span, label, .stMarkdown {
     color: #f1f5f9 !important;
     font-size: 15px !important;
@@ -47,20 +38,6 @@ p, li, span, label, .stMarkdown {
     padding: 20px 0;
     border-bottom: 2px solid #ff5a00;
     margin-bottom: 30px;
-}
-.brand-logos-left {
-    display: flex;
-    align-items: center;
-    gap: 30px;
-}
-.brand-logo-img {
-    height: 42px;
-    object-fit: contain;
-}
-.brand-divider {
-    width: 2px;
-    height: 35px;
-    background: rgba(255, 255, 255, 0.2);
 }
 .main-title {
     font-size: 24px !important;
@@ -80,6 +57,23 @@ p, li, span, label, .stMarkdown {
     line-height: 1.6 !important;
     color: #e2e8f0 !important;
 }
+
+/* HIGH-VISIBILITY UPLOAD BUTTON FIX */
+[data-testid="stFileUploader"] {
+    background-color: #1e293b !important;
+    border: 2px dashed #ff5a00 !important;
+    border-radius: 8px !important;
+    padding: 15px !important;
+}
+[data-testid="stFileUploader"] section {
+    color: #ffffff !important;
+}
+[data-testid="stFileUploader"] label p {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 16px !important;
+}
+
 .section-headline {
     font-size: 18px !important;
     font-weight: 700 !important;
@@ -95,7 +89,6 @@ p, li, span, label, .stMarkdown {
     padding: 18px;
     margin-bottom: 12px;
 }
-/* Extrem scharfer Kontrast für die Artikel-Schriftzüge */
 .news-headline {
     font-size: 17px !important;
     font-weight: 700 !important;
@@ -111,6 +104,27 @@ p, li, span, label, .stMarkdown {
 .news-url-anchor:hover {
     text-decoration: underline;
 }
+
+/* FEEDBACK AREA BOX */
+.feedback-box {
+    text-align: center;
+    padding: 40px;
+    border: 2px dashed #334155;
+    border-radius: 8px;
+    background: #111827;
+    margin-top: 20px;
+}
+.feedback-title {
+    color: #ff5a00 !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    margin-bottom: 8px;
+}
+.feedback-text {
+    color: #94a3b8 !important;
+    font-size: 14px !important;
+}
+
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 header {visibility: hidden;}
@@ -119,20 +133,16 @@ header {visibility: hidden;}
 st.markdown(ui_styles, unsafe_allow_html=True)
 
 # =========================================================
-# BEREINIGTER LOGO BRAND HEADER
+# NEW TEXT-BASED BRAND HEADER
 # =========================================================
-header_html = f"""
+header_html = """
 <div class="brand-header">
-    <div class="brand-logos-left">
-        <img src="{LOGO_ZDF_HEUTE}" class="brand-logo-img" alt="ZDFheute">
-        <div class="brand-divider"></div>
-        <img src="{LOGO_ZDF_DIGITAL}" class="brand-logo-img" alt="ZDF Digital">
-        <div class="brand-divider"></div>
-        <div class="main-title">WhatsApp Artikel-Checker</div>
+    <div class="main-title">
+        ZDFheute <span style="color:#ff5a00;">🧡</span> ZDF Digital <span style="color:#475569; font-weight:400; margin:0 10px;">|</span> WhatsApp Artikel-Checker
     </div>
     <div style="text-align: right; font-size: 11px; color: #94a3b8; font-weight: 600;">
         SYSTEMSTATUS: <span style="color: #2ed573;">● LIVE</span><br>
-        REVISION: 2026.9
+        REVISION: 2026.10
     </div>
 </div>
 """
@@ -152,12 +162,11 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =========================================================
-# KONTROLL-PANEL (RADIKAL VEREINFACHT)
+# KONTROLL-PANEL (MAX VISIBILITY UPLOAD)
 # =========================================================
 col_file, col_d1, col_d2 = st.columns([2, 1, 1])
 
 with col_file:
-    # Text exakt wie gewünscht geändert
     file = st.file_uploader("Hier Excel-Datei hochladen", type=["xlsx"])
 
 with col_d1:
@@ -370,4 +379,10 @@ if file:
         st.markdown('<div style="color:#2ed573; font-weight:600; padding:20px; background:rgba(46,213,115,0.1); border-radius:6px;">✔ Alle Artikel wurden bereits auf WhatsApp geteilt.</div>', unsafe_allow_html=True)
 
 else:
-    st.markdown('<div style="text-align:center; padding:50px; border: 2px dashed #334155; border-radius:8px; color:#94a3b8;">Bitte lade oben die Piano-Excel-Datei hoch.</div>', unsafe_allow_html=True)
+    # Der neue, maßgeschneiderte Feedback-Footer
+    st.markdown("""
+    <div class="feedback-box">
+        <div class="feedback-title">Du hast Feedback oder dir ist etwas aufgefallen? <span style="color:#ff5a00;">🧡</span></div>
+        <div class="feedback-text">Schreibe oder schicke deine Anmerkungen jederzeit direkt an <strong>Matthias Schmickl</strong>.</div>
+    </div>
+    """, unsafe_allow_html=True)
