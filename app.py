@@ -82,6 +82,12 @@ p, li, span, label, .stMarkdown {
     line-height: 1.5;
 }
 
+.download-text-hint {
+    font-size: 14px !important;
+    color: #94a3b8 !important;
+    margin-top: 15px;
+}
+
 [data-testid="stFileUploader"] {
     background: #0d111c !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -103,11 +109,11 @@ div.stDownloadButton > button {
     background-color: transparent !important;
     color: #ff5a00 !important;
     border: 1px solid rgba(255, 90, 0, 0.3) !important;
-    padding: 6px 12px !important;
+    padding: 6px 14px !important;
     font-size: 13px !important;
     border-radius: 4px !important;
     transition: all 0.2s ease !important;
-    margin-top: 10px !important;
+    margin-top: 8px !important;
 }
 div.stDownloadButton > button:hover {
     background-color: rgba(255, 90, 0, 0.1) !important;
@@ -208,7 +214,7 @@ function updateClock() {
     const year = now.getFullYear();
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).getSeconds();
+    const seconds = String(now.getSeconds()).padStart(2, '0');
     
     const timeString = `${day}.${month}.${year} - ${hours}:${minutes}:${seconds}`;
     const el = document.getElementById('live-ticker-2026');
@@ -221,15 +227,18 @@ updateClock();
 st.markdown(header_html, unsafe_allow_html=True)
 
 # =========================================================
-# SYSTEM-LOGIK UND SUBTILES TEXT-DOWNLOAD-PANEL
+# SYSTEM-LOGIK UND DEIN ADAPTIERTES DOWNLOAD-PANEL
 # =========================================================
 st.markdown("""
 <div class="editorial-info-box">
     Dieses Tool gleicht ab, welche Artikel, die in der ZDFheute App und auf Web veröffentlicht wurden, bereits auf dem WhatsApp-Kanal der ZDFheute erschienen sind. Am Ende zeigt es dir nur die Artikel an, die noch nicht publiziert wurden – gefiltert nach den Kategorien, die die Userinnen und User am meisten interessieren.
 </div>
+<div class="download-text-hint">
+    Du weißt nicht, wie du die erforderliche Excel-Datei bekommst? Hier gibt's die Anleitung zum Download:
+</div>
 """, unsafe_allow_html=True)
 
-# Text-Anleitung generieren fuer den Download
+# Inhalt fuer die Textdatei (Windows-optimiert)
 guide_text = """ANLEITUNG: EXCEL-EXPORT AUS PIANO ANALYTICS (WINDOWS)
 
 1. Oeffne dein Piano-Analytics-Dashboard.
@@ -248,7 +257,7 @@ DATEN SAUBER IN EXCEL IMPORTIEREN:
 - Klicke jetzt oben links auf "Datei" -> "Speichern unter", waehle als Dateityp "Excel-Arbeitsmappe (.xlsx)" und speichere sie ab."""
 
 st.download_button(
-    label="📄 Anleitung als .txt herunterladen",
+    label="Anleitung herunterladen (TXT)",
     data=guide_text,
     file_name="Anleitung_Piano_Export.txt",
     mime="text/plain"
