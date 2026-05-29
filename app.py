@@ -15,7 +15,7 @@ st.set_page_config(
 )
 
 # =========================================================
-# NEXT-GEN CYBER SLATE & BRAND CORAL THEME (STRICT SYNTAX)
+# NEXT-GEN CYBER SLATE & BRAND CORAL THEME
 # =========================================================
 ui_styles = """
 <style>
@@ -30,18 +30,22 @@ ui_styles = """
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 24px 0;
+    padding: 20px 0;
     border-bottom: 1px solid rgba(255, 90, 0, 0.15);
     margin-bottom: 35px;
 }
 .brand-logos-left {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 25px;
+}
+.brand-logo-img {
+    height: 45px;
+    object-fit: contain;
 }
 .brand-divider {
     width: 1px;
-    height: 35px;
+    height: 40px;
     background: rgba(255, 255, 255, 0.15);
 }
 .title-block {
@@ -49,10 +53,10 @@ ui_styles = """
     flex-direction: column;
 }
 .main-title {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 700;
     letter-spacing: -0.8px;
-    background: linear-gradient(135deg, #ffffff 30%, #ff5a00 100%);
+    background: linear-gradient(135deg, #ffffff 40%, #ff5a00 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -146,32 +150,30 @@ header {visibility: hidden;}
 st.markdown(ui_styles, unsafe_allow_html=True)
 
 # =========================================================
-# LOGO BRAND HEADER (ZDF / ZDF DIGITAL VECTORS)
+# LOGO BRAND HEADER (ORIGINAL BRAND ASSETS)
 # =========================================================
-header_html = """
+logo_zdf_heute = "https://upload.wikimedia.org/wikipedia/commons/4/41/Zdfheute-logo-2020.jpg"
+logo_zdf_digital = "https://www.zdf-digital.com/wp-content/themes/zdfdigital/assets/images/logo.svg"
+
+header_html = f"""
 <div class="brand-header">
     <div class="brand-logos-left">
-        <svg width="55" height="34" viewBox="0 0 100 62" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="100" height="62" rx="4" fill="#FF5A00"/>
-            <path d="M22 18H42L29 44H18L22 18Z" fill="white"/>
-            <path d="M41 18H55C64 18 69 22 67 29C65 37 58 44 48 44H34L41 18ZM49 24L45 38H49C54 38 57 35 58 31C59 27 56 24 51 24Z" fill="white"/>
-            <path d="M64 18H84L81 24H73L71 31H78L76 37H69L66 44H56L64 18Z" fill="white"/>
-        </svg>
+        <img src="{logo_zdf_heute}" class="brand-logo-img" alt="ZDFheute">
+        
         <div class="brand-divider"></div>
-        <svg width="110" height="34" viewBox="0 0 200 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <text x="0" y="28" fill="#FFFFFF" font-family="'Inter', sans-serif" font-weight="800" font-size="24" letter-spacing="-0.5">zdf</text>
-            <text x="38" y="28" fill="#FF5A00" font-family="'Inter', sans-serif" font-weight="800" font-size="24" letter-spacing="-0.5">digital</text>
-            <text x="1" y="44" fill="#64748b" font-family="'Inter', sans-serif" font-weight="600" font-size="10" letter-spacing="1">MEDIENPRODUKTION</text>
-        </svg>
+        
+        <img src="{logo_zdf_digital}" class="brand-logo-img" alt="ZDF Digital">
+        
         <div class="brand-divider"></div>
+        
         <div class="title-block">
             <div class="main-title">WhatsApp Artikel-Checker</div>
-            <div class="meta-subtitle">ZDFheute Content Quality Audit</div>
+            <div class="meta-subtitle">Redaktionelles Quality Audit</div>
         </div>
     </div>
     <div style="text-align: right; font-size: 11px; color: #475569; font-weight: 500;">
-        SYSTEMSTATUS: <span style="color: #2ed573; font-weight: 700;">● ONLINE</span><br>
-        ENGINE REVISION: 2026.5
+        SYSTEMSTATUS: <span style="color: #2ed573; font-weight: 700;">● LIVE-DATA</span><br>
+        ENGINE REVISION: 2026.8
     </div>
 </div>
 """
@@ -209,7 +211,6 @@ with col_d2:
 
 st.markdown("<div style='margin-bottom: 30px;'></div>", unsafe_allow_html=True)
 
-# Validierung der chronologischen Reihenfolge zur Vermeidung von Fehlfiltern
 if start_date > end_date:
     st.error("Fehler: Das Startdatum darf nicht nach dem Enddatum liegen.")
     st.stop()
@@ -222,6 +223,14 @@ end_datetime = datetime.combine(end_date, datetime.max.time())
 # =========================================================
 def should_filter_out(url):
     u = url.lower().strip()
+    
+    # NEU: Ausschluss-Filter für Dokus und Lottozahlen
+    if "zdf.de/dokumentation" in u or "zdf.de/dokus" in u:
+        return True
+    if "lottozahlen.zdf.de" in u:
+        return True
+        
+    # Standard-Ausschluss-Filter
     if "zdf.de/video" in u or "zdfheute.de/video" in u or "/video/" in u:
         return True
     if "zdfheute.de/briefing" in u or "zdf.de/briefing" in u or "/briefing" in u:
@@ -233,6 +242,7 @@ def should_filter_out(url):
     if "phoenix.de" in u:
         return True
         
+    # Homepages / Index-Seiten filtern
     clean_url = u.replace("https://", "").replace("http://", "").replace("www.", "")
     parts = [p for p in clean_url.split('/') if p]
     if len(parts) <= 2: 
@@ -419,7 +429,6 @@ if file:
             st.markdown(f'<div class="section-headline">{cat} ({len(items)})</div>', unsafe_allow_html=True)
             
             for item in items:
-                # Sicheres Escapen der dynamischen Variablen innerhalb des HTML-Injekts
                 headline = item['title'].replace('"', '&quot;')
                 url = item['url']
                 st.markdown(f"""
