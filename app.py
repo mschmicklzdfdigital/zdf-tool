@@ -74,12 +74,26 @@ p, li, span, label, .stMarkdown {
 .editorial-info-box {
     background: #0d111c;
     border-left: 3px solid #ff5a00;
-    padding: 16px 20px;
+    padding: 20px 24px;
     border-radius: 0 8px 8px 0;
     margin-bottom: 25px;
     font-size: 14.5px;
     color: #cbd5e1 !important;
-    line-height: 1.5;
+    line-height: 1.6;
+}
+
+.info-bullet-list {
+    margin-top: 15px;
+    padding-left: 5px;
+}
+
+.info-bullet-item {
+    margin-bottom: 12px;
+    color: #94a3b8 !important;
+}
+
+.info-bullet-item strong {
+    color: #ffffff !important;
 }
 
 [data-testid="stFileUploader"] {
@@ -223,11 +237,28 @@ updateClock();
 st.markdown(header_html, unsafe_allow_html=True)
 
 # =========================================================
-# MAIN INFOKASTEN
+# MAIN INFOKASTEN MIT AKTUALISIERTEM REDAKTIONSTEXT
 # =========================================================
 st.markdown("""
 <div class="editorial-info-box">
-    Dieses Tool gleicht ab, welche Artikel, die in der ZDFheute App und auf Web veröffentlicht wurden, bereits auf dem WhatsApp-Kanal der ZDFheute erschienen sind. Am Ende zeigt es dir nur die Artikel an, die noch nicht publiziert wurden – gefiltert nach den Kategorien, die die Userinnen und User am meisten interessieren.
+    Dieses Tool gleicht ab, welche Web/App-Artikel von ZDFheute bereits auf dem WhatsApp-Kanal der ZDFheute erschienen sind. Am Ende zeigt es dir nur die Artikel an, die noch nicht publiziert wurden – gefiltert nach den Kategorien, die die User*innen am meisten interessieren:
+    <div class="info-bullet-list">
+        <div class="info-bullet-item">
+            <strong>• Macht und Folgen (Politik, Analysen & internationale Themen):</strong> Hier sammeln wir alles, was erklärt, einordnet und Zusammenhänge sichtbar macht. Ein Blick auf die Daten zeigt: Diese tiefgründigen Inhalte erzielen oft niedrigere Bounce-Rates, das heißt: Die User*innen bleiben nachweislich länger dran, wenn sie genau wissen, was sie erwartet.
+        </div>
+        <div class="info-bullet-item">
+            <strong>• Gut zu wissen (Service, Ratgeber & Wetter):</strong> Das betrifft genau die nützlichen Service-Inhalte, die im großen Tagesupdate manchmal keinen Platz mehr finden, aber extrem verlässlich Klicks und Reichweite bringen.
+        </div>
+        <div class="info-bullet-item">
+            <strong>• Zwischen Tat und Aufklärung (True Crime):</strong> Ein fokussierter Filter für Kriminalitätsreportagen, Prozesse und aktuelle Ermittlungen. Wir wissen: True-Crime-Artikel gehören zu den am häufigsten gelesenen Geschichten der User*innen.
+        </div>
+        <div class="info-bullet-item">
+            <strong>• Trends, Pop & Kurioses (Popkultur, Social Media & Kurioses):</strong> Leichtere, neugiergetriebene Themen, die Trends aufgreifen oder kurios sind, dabei aber trotzdem den gewohnten erklärenden Ansatz von ZDFheute behalten.
+        </div>
+        <div class="info-bullet-item">
+            <strong>• Sonstige Artikel:</strong> Alles, was in keine der oberen Core-Kategorien fällt, damit garantiert kein relevanter Text durchs Raster fällt.
+        </div>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
