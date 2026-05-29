@@ -7,54 +7,126 @@ import unicodedata
 
 
 # =========================================================
-# PAGE CONFIG (NEU: LOOK & FEEL)
+# PAGE CONFIG
 # =========================================================
 st.set_page_config(
     page_title="ZDFheute WhatsApp Checker",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
 
 # =========================================================
-# HEADER AREA (UI UPGRADE)
+# ZDFheute CI THEME (APP STYLE BASE)
 # =========================================================
-col1, col2, col3 = st.columns([1, 2, 1])
+st.markdown("""
+<style>
 
-with col2:
-    st.title("ZDFheute Whatsapp Artikel-Checker")
-    st.caption("by ZDF Digital News-Redaktion")
+/* MAIN BACKGROUND */
+.stApp {
+    background-color: #306084;
+    color: white;
+    font-family: Arial, sans-serif;
+}
 
-st.markdown("---")
+/* HEADER STYLE */
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background: #253544;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 1000;
+}
 
+/* LOGO STYLE */
+.logo {
+    font-size: 22px;
+    font-weight: bold;
+    color: white;
+}
 
-# Logos (Platzhalter – kannst du jederzeit ersetzen)
-logo_col1, logo_col2 = st.columns(2)
+.logo span {
+    color: #ff4d00;
+}
 
-with logo_col1:
-    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/ZDF_logo.svg/512px-ZDF_logo.svg.png", width=140)
+/* CATEGORY BAR */
+.subheader {
+    margin-top: 80px;
+    display: flex;
+    gap: 15px;
+    padding: 10px 20px;
+    overflow-x: auto;
+}
 
-with logo_col2:
-    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/ZDFheute_logo.svg/512px-ZDFheute_logo.svg.png", width=140)
+.category {
+    background: rgba(255,255,255,0.15);
+    padding: 8px 14px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
 
-st.markdown("---")
+/* CARD STYLE */
+.card {
+    background: rgba(255,255,255,0.08);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+}
+
+/* LINKS */
+a {
+    color: #ff7a1a;
+    text-decoration: none;
+}
+
+</style>
+""", unsafe_allow_html=True)
 
 
 # =========================================================
-# DESCRIPTION
+# HEADER (ZDFheute STYLE)
 # =========================================================
+st.markdown("""
+<div class="header">
+    <div>☰ Menü</div>
+    <div class="logo">ZDF<span>heute</span></div>
+    <div>★ Merkliste 🔍 Suche</div>
+</div>
+""", unsafe_allow_html=True)
+
+
+# =========================================================
+# SUBHEADER (KATEGORIEN)
+# =========================================================
+st.markdown("""
+<div class="subheader">
+    <div class="category">ZDFheute</div>
+    <div class="category">Iran</div>
+    <div class="category">Ukraine</div>
+    <div class="category">Fußball-WM</div>
+</div>
+""", unsafe_allow_html=True)
+
+
+# =========================================================
+# TITEL / INFO
+# =========================================================
+st.markdown("## ZDFheute Whatsapp Artikel-Checker")
+st.caption("by ZDF Digital News-Redaktion")
+
 st.markdown("""
 Dieses Tool vergleicht eine Excel-Datei mit den im definierten Zeitraum veröffentlichten ZDFheute-Artikeln, identifiziert die Inhalte, die noch nicht im WhatsApp-Kanal erschienen sind, und ordnet sie automatisch in thematische Kategorien ein. Feedback kann gerne an Matthias Schmickl gegeben werden.
 """)
 
 
 # =========================================================
-# UPLOAD (FIX: TEXT ENTFERNT)
-# =========================================================
-file = st.file_uploader("Excel hochladen")
-
-
-# =========================================================
-# HARTE EXKLUSION
+# EXCLUSION RULES
 # =========================================================
 BLOCK_PREFIXES = [
     "https://www.zdfheute.de/briefing",
@@ -69,9 +141,9 @@ BLOCK_PREFIXES = [
 
 
 # =========================================================
-# NORMALISIERUNG
+# NORMALIZATION
 # =========================================================
-def normalize_text(t: str) -> str:
+def normalize_text(t):
     if not isinstance(t, str):
         return ""
     t = t.lower().strip()
@@ -81,17 +153,14 @@ def normalize_text(t: str) -> str:
     return t
 
 
-def normalize_url(u: str) -> str:
+def normalize_url(u):
     if not isinstance(u, str):
         return ""
-    u = u.lower().strip()
-    u = u.split("?")[0]
-    u = u.rstrip("/")
-    return u
+    return u.lower().split("?")[0].rstrip("/")
 
 
 # =========================================================
-# KATEGORIEN
+# CATEGORY ENGINE
 # =========================================================
 C_POLITICS = "Macht und Folgen"
 C_SERVICE = "Service & Alltag"
@@ -101,9 +170,6 @@ C_SOCIAL = "Gesellschaft & Alltag"
 C_OTHER = "Sonstiges"
 
 
-# =========================================================
-# KATEGORISIERUNG
-# =========================================================
 def categorize(title, url):
 
     t = title.lower()
@@ -120,53 +186,24 @@ def categorize(title, url):
 
     if "/panorama" in u:
 
-        if any(x in t for x in [
-            "unfall","explosion","feuer","rettung","mord",
-            "polizei","tat","anschlag","ermittlung","kriminal"
-        ]):
+        if any(x in t for x in ["unfall","mord","polizei","explosion","kriminal","anschlag"]):
             return C_CRIME
 
-        if any(x in t for x in [
-            "gesundheit","wetter","hitze","ernährung","geld",
-            "energie","kosten","tipps","haushalt","rezept"
-        ]):
+        if any(x in t for x in ["gesundheit","wetter","ernährung","energie","kosten","rezept"]):
             return C_SERVICE
 
-        if any(x in t for x in [
-            "promi","star","stars","heidi","helene","klum","fischer",
-            "lindenberg","sänger","schauspieler","musiker","moderator",
-            "film","serie","tv","show","konzert","musik",
-            "instagram","tiktok","viral","trend","mode","fashion"
-        ]):
+        if any(x in t for x in ["promi","star","heidi","helene","klum","fischer","musik","film","serie","show"]):
             return C_ENTERTAINMENT
 
         return C_SOCIAL
 
-    if any(x in t for x in [
-        "polizei","gericht","mord","tat","verbrechen",
-        "prozess","urteil","ermittlung","anschlag"
-    ]):
-        return C_CRIME
-
-    if any(x in t for x in [
-        "rezept","kochen","ernährung","gesundheit","arzt",
-        "geld","steuer","rente","miete","verbraucher",
-        "energie","kosten","spar"
-    ]):
-        return C_SERVICE
-
-    if any(x in t for x in [
-        "politik","regierung","bundestag","wahl","eu","usa",
-        "russland","china","krieg","konflikt","nato",
-        "analyse","einordnung"
-    ]):
+    if any(x in t for x in ["politik","krieg","nato","eu","regierung","bundestag"]):
         return C_POLITICS
 
-    if any(x in t for x in [
-        "promi","star","musik","film","serie","tv","show",
-        "konzert","instagram","tiktok","viral","trend",
-        "mode","fashion"
-    ]):
+    if any(x in t for x in ["rezept","gesundheit","geld","steuer","rente","verbraucher"]):
+        return C_SERVICE
+
+    if any(x in t for x in ["promi","star","musik","film","serie","show","trend"]):
         return C_ENTERTAINMENT
 
     return C_OTHER
@@ -209,10 +246,7 @@ def get_articles():
                 if any(u.startswith(x) for x in BLOCK_PREFIXES):
                     continue
 
-                articles.append({
-                    "title": title.strip(),
-                    "url": link.strip()
-                })
+                articles.append({"title": title, "url": link})
 
         except:
             continue
@@ -221,21 +255,23 @@ def get_articles():
 
 
 # =========================================================
-# MAIN
+# UPLOAD
+# =========================================================
+file = st.file_uploader("Excel hochladen")
+
+
+# =========================================================
+# MAIN LOGIC
 # =========================================================
 if file:
 
     df = pd.read_excel(file, engine="openpyxl")
 
-    excel_titles = set()
+    excel_titles = set(normalize_text(x) for x in df.iloc[:,0].astype(str))
+
     excel_urls = set()
-
-    for t in df.iloc[:, 0].astype(str):
-        excel_titles.add(normalize_text(t))
-
     if df.shape[1] > 1:
-        for u in df.iloc[:, 1].astype(str):
-            excel_urls.add(normalize_url(u))
+        excel_urls = set(normalize_url(x) for x in df.iloc[:,1].astype(str))
 
     articles = get_articles()
 
@@ -244,14 +280,14 @@ if file:
 
     for a in articles:
 
-        url_norm = normalize_url(a["url"])
-        title_norm = normalize_text(a["title"])
+        url = normalize_url(a["url"])
+        title = normalize_text(a["title"])
 
-        if url_norm in seen:
+        if url in seen:
             continue
-        seen.add(url_norm)
+        seen.add(url)
 
-        if url_norm in excel_urls:
+        if url in excel_urls:
             continue
 
         cat = categorize(a["title"], a["url"])
@@ -276,8 +312,12 @@ if file:
         items = grouped.get(cat, [])
 
         if items:
-            st.subheader(cat)
+            st.markdown(f"## {cat}")
 
             for a in items:
-                st.write(a["title"])
-                st.write(a["url"])
+                st.markdown(f"""
+                <div class="card">
+                    <b>{a['title']}</b><br>
+                    <a href="{a['url']}" target="_blank">{a['url']}</a>
+                </div>
+                """, unsafe_allow_html=True)
