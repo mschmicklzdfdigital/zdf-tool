@@ -2,78 +2,85 @@ import streamlit as st
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from datetime import datetime, timedelta
+from datetime import datetime
+import xml.etree.ElementTree as ET
 
 
 # -------------------------
-# KATEGORIEN
+# KATEGORIEN (robust & breit)
 # -------------------------
 def categorize(t):
     t = t.lower()
 
     if any(x in t for x in [
-        "politik","krieg","wahl","regierung","usa","eu","russland",
-        "china","international","analyse","einordnung","macht","konflikt","hintergrund"
+        "politik","krieg","wahl","regierung","eu","usa","russland",
+        "china","international","analyse","einordnung","gipfel","konflikt",
+        "hintergrund"
     ]):
         return "Macht und Folgen"
 
     if any(x in t for x in [
-        "ratgeber","tipps","wissen","erklärt","geld","gesundheit",
-        "verbraucher","hilfe","check","so geht"
+        "ratgeber","tipps","wissen","erklärt","geld","steuer","rente",
+        "gesundheit","essen","rezept","service","verbraucher","miete"
     ]):
-        return "Gut zu wissen"
+        return "Service & Alltag"
 
     if any(x in t for x in [
-        "polizei","tat","mord","gericht","unfall","prozess",
-        "verbrechen","täter","opfer","ermittlung"
+        "polizei","tat","mord","gericht","prozess","verbrechen",
+        "ermittlung","täter","opfer","unfall"
     ]):
         return "Zwischen Tat und Aufklärung"
 
     if any(x in t for x in [
-        "trend","viral","tiktok","promi","show",
-        "musik","social","internet","kurios"
+        "trend","viral","tiktok","promi","show","musik","social",
+        "internet","kino","serie","kurios"
     ]):
-        return "Trends & Kurioses"
+        return "Trends & Unterhaltung"
 
-    return None
+    return "Sonstiges"
 
 
 # -------------------------
-# ZDF SCRAPER (verbessert)
+# DATENQUELLE (RSS = stabil + vollständig)
 # -------------------------
-@st.cache_data(ttl=300)
-def get_zdf_articles():
+@st.cache_data(ttl=600)
+def get_articles():
 
-    url = "https://www.zdfheute.de/"
-    r = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
-    soup = BeautifulSoup(r.text, "lxml")
+    feeds = [
+        "https://www.zdf.de/rss/zdf/nachrichten",
+        "https://www.zdf.de/rss/zdf/politik",
+        "https://www.zdf.de/rss/zdf/wirtschaft",
+        "https://www.zdf.de/rss/zdf/panorama",
+        "https://www.zdf.de/rss/zdf/sport"
+    ]
 
     articles = []
 
-    for a in soup.find_all("a", href=True):
+    for feed in feeds:
 
-        title = a.get_text(strip=True)
-        link = a["href"]
+        try:
+            r = requests.get(feed, headers={"User-Agent": "Mozilla/5.0"})
+            root = ET.fromstring(r.content)
 
-        if len(title) < 10:
+            for item in root.findall(".//item"):
+
+                title = item.find("title").text if item.find("title") is not None else None
+                link = item.find("link").text if item.find("link") is not None else None
+
+                if not title or not link:
+                    continue
+
+                # ❌ Videos raus
+                if "video" in title.lower():
+                    continue
+
+                articles.append({
+                    "title": title.strip(),
+                    "url": link
+                })
+
+        except:
             continue
-
-        # ❌ VIDEO FILTER
-        if "video" in title.lower() or "video" in link.lower():
-            continue
-
-        # URL fix
-        if link.startswith("/"):
-            link = "https://www.zdfheute.de" + link
-
-        if "zdf" not in link:
-            continue
-
-        articles.append({
-            "title": title.strip(),
-            "url": link,
-            "time": datetime.utcnow()
-        })
 
     return articles
 
@@ -83,31 +90,24 @@ def get_zdf_articles():
 # -------------------------
 st.title("ZDFheute Excel Abgleich Tool")
 
-file = st.file_uploader("Excel hochladen (erste Spalte = Titel)")
 
-days = st.slider("Zeitraum (letzte Tage)", 1, 14, 3)
+file = st.file_uploader("Excel hochladen (erste Spalte = Titel)")
 
 
 # -------------------------
-# MAIN LOGIC
+# MAIN LOGIK
 # -------------------------
 if file:
 
-    df = pd.read_excel(file)
+    df = pd.read_excel(file, engine="openpyxl")
+
     excel_titles = set(
         df.iloc[:, 0].astype(str).str.lower().str.strip()
     )
 
-    cutoff = datetime.utcnow() - timedelta(days=days)
+    articles = get_articles()
 
-    articles = get_zdf_articles()
-
-    grouped = {
-        "Macht und Folgen": [],
-        "Gut zu wissen": [],
-        "Zwischen Tat und Aufklärung": [],
-        "Trends & Kurioses": []
-    }
+    grouped = {}
 
     seen = set()
 
@@ -115,33 +115,40 @@ if file:
 
         title = a["title"].lower().strip()
 
-        # ❌ doppelt raus
+        # Duplikate vermeiden
         if title in seen:
             continue
         seen.add(title)
 
-        # ❌ schon in Excel
+        # ❌ nur NICHT in Excel anzeigen
         if title in excel_titles:
-            continue
-
-        # ❌ Zeitraum
-        if a["time"] < cutoff:
             continue
 
         cat = categorize(title)
 
-        # ❌ nicht relevante Inhalte raus
-        if not cat:
-            continue
+        if cat not in grouped:
+            grouped[cat] = []
 
         grouped[cat].append(a)
 
+
     # -------------------------
-    # OUTPUT
+    # OUTPUT (fixe Reihenfolge)
     # -------------------------
-    for cat, items in grouped.items():
+    order = [
+        "Macht und Folgen",
+        "Service & Alltag",
+        "Zwischen Tat und Aufklärung",
+        "Trends & Unterhaltung",
+        "Sonstiges"
+    ]
+
+    for cat in order:
+
+        items = grouped.get(cat, [])
 
         if items:
+
             st.subheader(cat)
 
             for a in items:
