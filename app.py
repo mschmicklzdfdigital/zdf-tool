@@ -10,6 +10,10 @@ import xml.etree.ElementTree as ET
 st.title("ZDFheute Whatsapp Artikel-Checker")
 st.caption("by ZDF Digital News-Redaktion")
 
+st.markdown("""
+Dieses Tool vergleicht eine Excel-Datei mit den im definierten Zeitraum veröffentlichten ZDFheute-Artikeln, identifiziert die Inhalte, die noch nicht im WhatsApp-Kanal erschienen sind, und ordnet sie automatisch in thematische Kategorien ein. Feedback kann gerne an Matthias Schmickl gegeben werden.
+""")
+
 
 # =========================================================
 # HARTE EXKLUSION (IMMER ZUERST!)
@@ -33,26 +37,18 @@ def categorize(title, url):
     t = title.lower()
     u = url.lower()
 
-    # =========================
     # 1. HARD EXCLUSION
-    # =========================
     if any(u.startswith(x) for x in BLOCK_PREFIXES):
         return None
 
-
-    # =========================
-    # 2. HARD URL RULES
-    # =========================
-
-    # 🟦 POLITIK
+    # 2. URL PRIORITY
     if "/politik" in u:
         return "Macht und Folgen"
 
-    # 🟩 SERVICE
     if "/ratgeber" in u:
         return "Service & Alltag"
 
-    # 🟥 PANORAMA = default society OR entertainment hybrid
+    # 3. PANORAMA SPECIAL CASE
     if "/panorama" in u:
 
         entertainment_keywords = [
@@ -66,55 +62,39 @@ def categorize(title, url):
 
         return "Gesellschaft & Alltag"
 
-
-    # =========================
-    # 3. CRIME / JUSTICE
-    # =========================
+    # 4. CRIME
     if any(x in t for x in [
         "polizei","gericht","mord","tat","verbrechen",
         "prozess","urteil","ermittlung","anschlag"
     ]):
         return "Zwischen Tat und Aufklärung"
 
-
-    # =========================
-    # 4. SERVICE KEYWORDS FALLBACK
-    # =========================
+    # 5. SERVICE KEYWORDS
     if any(x in t for x in [
-        "essen","rezept","ernährung","haushalt","gesundheit",
+        "essen","rezept","ernährung","kochen","haushalt","gesundheit",
         "geld","steuer","rente","miete","verbraucher"
     ]):
         return "Service & Alltag"
 
-
-    # =========================
-    # 5. POLITICS KEYWORDS FALLBACK
-    # =========================
+    # 6. POLITICS KEYWORDS
     if any(x in t for x in [
         "politik","regierung","bundestag","wahl","krieg",
         "eu","usa","russland","china","analyse","einordnung"
     ]):
         return "Macht und Folgen"
 
-
-    # =========================
-    # 6. ENTERTAINMENT GLOBAL FALLBACK
-    # =========================
+    # 7. ENTERTAINMENT FALLBACK
     if any(x in t for x in [
         "promi","star","show","film","serie","musik",
         "tv","viral","trend","social","tiktok","instagram"
     ]):
         return "Trends & Unterhaltung"
 
-
-    # =========================
-    # 7. FALLBACK
-    # =========================
     return "Sonstiges"
 
 
 # =========================================================
-# RSS FETCH (simplified, stable)
+# RSS FETCH
 # =========================================================
 @st.cache_data(ttl=600)
 def get_articles():
@@ -211,6 +191,7 @@ if file:
         items = grouped.get(cat, [])
 
         if items:
+
             st.subheader(cat)
 
             for a in items:
