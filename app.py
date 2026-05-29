@@ -5,202 +5,143 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, date
 
 # =========================================================
-# PAGE CONFIGURATION (PIKFEIN & PROFESSIONAL)
+# PAGE CONFIGURATION (ULTRA PREMIUM & CLEAN)
 # =========================================================
 st.set_page_config(
-    page_title="ZDFheute | WhatsApp Artikel-Checker",
+    page_title="ZDFheute | WhatsApp Intelligence Hub",
     page_icon="🧡",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
 # =========================================================
-# MODERN ZDF CORAL & SLATE PREMIUM THEME
+# NEXT-GEN 2026 CYBER SLATE & BRAND CORAL THEME
 # =========================================================
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-/* Main App Background Override */
+/* Global Reset & Base Theme */
 .stApp {
-    background: radial-gradient(circle at top left, #121c2e, #070b12);
-    color: #f1f3f5;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+    background: radial-gradient(circle at 50% 0%, #0d1527 0%, #050810 100%);
+    color: #f8fafc;
+    font-family: 'Inter', -apple-system, sans-serif;
 }
 
-/* Custom Header Container */
-.zdf-header {
+/* Brand Header Grid */
+.brand-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 0;
-    border-bottom: 2px solid rgba(255, 77, 0, 0.15);
-    margin-bottom: 30px;
+    padding: 24px 0;
+    border-bottom: 1px solid rgba(255, 90, 0, 0.15);
+    margin-bottom: 35px;
 }
 
-.zdf-logo-container {
+.brand-logos-left {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 20px;
 }
 
-.zdf-title {
-    font-size: 26px;
+.brand-divider {
+    width: 1px;
+    height: 35px;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.title-block {
+    display: flex;
+    flex-direction: column;
+}
+
+.main-title {
+    font-size: 28px;
     font-weight: 700;
-    letter-spacing: -0.5px;
-    background: linear-gradient(90deg, #ffffff 0%, #ff5a00 100%);
+    letter-spacing: -0.8px;
+    background: linear-gradient(135deg, #ffffff 30%, #ff5a00 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
-.zdf-subtitle {
-    font-size: 13px;
-    color: #8a99ad;
+.meta-subtitle {
+    font-size: 11px;
+    color: #64748b;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
-    margin-top: -4px;
+    letter-spacing: 2px;
+    font-weight: 600;
+    margin-top: 2px;
 }
 
-/* Premium Info Box & Cards */
-.intro-container {
-    background: rgba(255, 255, 255, 0.03);
+/* Glassmorphic Info Wrapper */
+.premium-info-wrapper {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-left: 4px solid #ff5a00;
-    border-radius: 4px 12px 12px 4px;
+    border-radius: 8px;
     padding: 20px;
-    margin-bottom: 35px;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    margin-bottom: 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(12px);
 }
 
-.intro-text {
+.premium-info-text {
     font-size: 15px;
     line-height: 1.6;
-    color: #e2e8f0;
+    color: #cbd5e1;
+    font-weight: 400;
 }
 
-.category-header {
-    font-size: 18px;
+/* Category Headers with Sleek Glow */
+.section-headline {
+    font-size: 17px;
     font-weight: 600;
-    color: #ff5a00;
-    margin: 30px 0 15px 0;
-    padding-bottom: 6px;
-    border-bottom: 1px solid rgba(255, 77, 0, 0.2);
+    color: #ffffff;
+    margin: 35px 0 15px 0;
+    padding-left: 12px;
+    border-left: 3px solid #ff5a00;
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-/* Glassmorphic Article Cards */
-.article-card {
-    background: rgba(20, 30, 48, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+/* Advanced Article Minimalist Cards */
+.news-card {
+    background: rgba(13, 22, 41, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.04);
     border-radius: 12px;
-    padding: 18px;
-    margin-bottom: 12px;
-    backdrop-filter: blur(12px);
-    transition: all 0.25s ease-in-out;
+    padding: 20px;
+    margin-bottom: 14px;
+    backdrop-filter: blur(20px);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.article-card:hover {
-    border: 1px solid rgba(255, 77, 0, 0.3);
-    background: rgba(255, 77, 0, 0.02);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 77, 0, 0.05);
+.news-card:hover {
+    border: 1px solid rgba(255, 90, 0, 0.4);
+    background: linear-gradient(90deg, rgba(255, 90, 0, 0.03) 0%, rgba(13, 22, 41, 0.6) 100%);
+    transform: translateX(4px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
 }
 
-.article-headline {
+.news-headline {
     font-size: 16px;
     font-weight: 600;
     color: #ffffff;
-    margin-bottom: 6px;
-    line-height: 1.4;
+    margin-bottom: 8px;
+    line-height: 1.45;
 }
 
-.article-link {
-    font-size: 13px;
+.news-url-anchor {
+    font-size: 12px;
     color: #ff5a00;
     text-decoration: none;
-    word-break: break-all;
     font-weight: 500;
+    word-break: break-all;
+    opacity: 0.85;
+    transition: opacity 0.2s;
 }
 
-.article-link:hover {
+.news-url-anchor:hover {
+    opacity: 1;
     text-decoration: underline;
-    color: #ff7c33;
 }
-
-/* Stat KPI Blocks */
-.kpi-container {
-    background: rgba(255, 77, 0, 0.04);
-    border: 1px solid rgba(255, 77, 0, 0.15);
-    border-radius: 14px;
-    padding: 20px;
-    text-align: center;
-    box-shadow: inset 0 0 15px rgba(255, 77, 0, 0.02);
-}
-
-.kpi-value {
-    font-size: 36px;
-    font-weight: 700;
-    color: #ffffff;
-    line-height: 1;
-    margin-bottom: 4px;
-}
-
-.kpi-label {
-    font-size: 13px;
-    color: #a0aec0;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-/* Hide default streamlit clutter */
-#MainMenu {visibility: hidden;}
-footer {visibility: hidden;}
-header {visibility: hidden;}
-</style>
-""", unsafe_allow_html=True)
-
-# =========================================================
-# BRAND HEADER WITH PIXEL-PERFECT VECTORS
-# =========================================================
-st.markdown("""
-<div class="zdf-header">
-    <div class="zdf-logo-container">
-        <svg width="65" height="40" viewBox="0 0 100 62" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="100" height="62" rx="6" fill="#FF5A00"/>
-            <path d="M22 18H42L29 44H18L22 18Z" fill="white"/>
-            <path d="M41 18H55C64 18 69 22 67 29C65 37 58 44 48 44H34L41 18ZM49 24L45 38H49C54 38 57 35 58 31C59 27 56 24 51 24Z" fill="white"/>
-            <path d="M64 18H84L81 24H73L71 31H78L76 37H69L66 44H56L64 18Z" fill="white"/>
-        </svg>
-        <div>
-            <div class="zdf-title">WhatsApp Artikel-Checker</div>
-            <div class="zdf-subtitle">ZDF Digital News-Redaktion</div>
-        </div>
-    </div>
-    <div style="text-align: right; color: #8a99ad; font-size: 12px; font-weight: 500;">
-        Plattform-Standard v2026.1<br>
-        <span style="color: #ff5a00;">●</span> Live-Abgleich aktiv
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-# =========================================================
-# REQUIRED TEXT COMPONENT (EXACT TEXT WORDING)
-# =========================================================
-st.markdown("""
-<div class="intro-container">
-    <div class="intro-text">
-        Dieses Tool analysiert ZDFheute-Artikel im gewählten Zeitraum, vergleicht sie mit einer 
-        Excel-Liste der Artikel, die auf dem WhatsApp-Kanal der ZDFheute liefen (anhand der piano-Excel-Datei) 
-        und zeigt dir nur die Inhalte, die noch nicht im WhatsApp-Kanal veröffentlicht wurden.
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-# =========================================================
-# CONTROL PANEL (INTEGRATED & CLEAN UI SLEEK GRID)
-# =========================================================
-st.markdown("<p style='font-weight: 600; font-size: 16px; margin-bottom: 5px; color: #ffffff;'>⚙️ Konfiguration & Datenquelle</p>", unsafe_allow_html=True)
-
-col_file, col_d1, col_
