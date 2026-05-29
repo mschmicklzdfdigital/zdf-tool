@@ -2,286 +2,205 @@ import streamlit as st
 import pandas as pd
 import requests
 import xml.etree.ElementTree as ET
-from datetime import datetime
-
+from datetime import datetime, date
 
 # =========================================================
-# PAGE CONFIG
+# PAGE CONFIGURATION (PIKFEIN & PROFESSIONAL)
 # =========================================================
 st.set_page_config(
-    page_title="ZDFheute WhatsApp Artikel-Checker",
-    layout="wide"
+    page_title="ZDFheute | WhatsApp Artikel-Checker",
+    page_icon="🧡",
+    layout="wide",
+    initial_sidebar_state="collapsed"
 )
 
-
 # =========================================================
-# MODERN 2026 GLASS UI THEME
+# MODERN ZDF CORAL & SLATE PREMIUM THEME
 # =========================================================
 st.markdown("""
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+/* Main App Background Override */
 .stApp {
-    background: radial-gradient(circle at top, #0b1220, #05070f);
-    color: white;
-    font-family: Inter, Arial;
+    background: radial-gradient(circle at top left, #121c2e, #070b12);
+    color: #f1f3f5;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
 }
 
-/* HEADER */
-.header {
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding: 18px 28px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+/* Custom Header Container */
+.zdf-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 2px solid rgba(255, 77, 0, 0.15);
+    margin-bottom: 30px;
 }
 
-/* GLASS CARDS */
-.card {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.08);
-    padding: 14px;
-    border-radius: 14px;
-    backdrop-filter: blur(10px);
-    margin-bottom: 10px;
+.zdf-logo-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
-/* KPI */
-.kpi {
-    background: rgba(255,77,0,0.08);
-    border: 1px solid rgba(255,77,0,0.25);
-    padding: 16px;
-    border-radius: 14px;
-    text-align:center;
-}
-
-/* TITLE */
-.title {
-    font-size: 22px;
+.zdf-title {
+    font-size: 26px;
     font-weight: 700;
+    letter-spacing: -0.5px;
+    background: linear-gradient(90deg, #ffffff 0%, #ff5a00 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-/* TAGS */
-.tag {
-    display:inline-block;
-    padding:6px 10px;
-    border-radius:20px;
-    margin:4px;
-    background: rgba(255,255,255,0.08);
-    font-size: 12px;
+.zdf-subtitle {
+    font-size: 13px;
+    color: #8a99ad;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-top: -4px;
 }
 
-/* BUTTON LOOK */
-.stButton>button {
-    background:#ff4d00;
-    color:white;
-    border-radius:10px;
+/* Premium Info Box & Cards */
+.intro-container {
+    background: rgba(255, 255, 255, 0.03);
+    border-left: 4px solid #ff5a00;
+    border-radius: 4px 12px 12px 4px;
+    padding: 20px;
+    margin-bottom: 35px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
+.intro-text {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #e2e8f0;
+}
+
+.category-header {
+    font-size: 18px;
+    font-weight: 600;
+    color: #ff5a00;
+    margin: 30px 0 15px 0;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255, 77, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Glassmorphic Article Cards */
+.article-card {
+    background: rgba(20, 30, 48, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 12px;
+    backdrop-filter: blur(12px);
+    transition: all 0.25s ease-in-out;
+}
+
+.article-card:hover {
+    border: 1px solid rgba(255, 77, 0, 0.3);
+    background: rgba(255, 77, 0, 0.02);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 77, 0, 0.05);
+}
+
+.article-headline {
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 6px;
+    line-height: 1.4;
+}
+
+.article-link {
+    font-size: 13px;
+    color: #ff5a00;
+    text-decoration: none;
+    word-break: break-all;
+    font-weight: 500;
+}
+
+.article-link:hover {
+    text-decoration: underline;
+    color: #ff7c33;
+}
+
+/* Stat KPI Blocks */
+.kpi-container {
+    background: rgba(255, 77, 0, 0.04);
+    border: 1px solid rgba(255, 77, 0, 0.15);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: inset 0 0 15px rgba(255, 77, 0, 0.02);
+}
+
+.kpi-value {
+    font-size: 36px;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.kpi-label {
+    font-size: 13px;
+    color: #a0aec0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Hide default streamlit clutter */
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+header {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
+# =========================================================
+# BRAND HEADER WITH PIXEL-PERFECT VECTORS
+# =========================================================
+st.markdown("""
+<div class="zdf-header">
+    <div class="zdf-logo-container">
+        <svg width="65" height="40" viewBox="0 0 100 62" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="62" rx="6" fill="#FF5A00"/>
+            <path d="M22 18H42L29 44H18L22 18Z" fill="white"/>
+            <path d="M41 18H55C64 18 69 22 67 29C65 37 58 44 48 44H34L41 18ZM49 24L45 38H49C54 38 57 35 58 31C59 27 56 24 51 24Z" fill="white"/>
+            <path d="M64 18H84L81 24H73L71 31H78L76 37H69L66 44H56L64 18Z" fill="white"/>
+        </svg>
+        <div>
+            <div class="zdf-title">WhatsApp Artikel-Checker</div>
+            <div class="zdf-subtitle">ZDF Digital News-Redaktion</div>
+        </div>
+    </div>
+    <div style="text-align: right; color: #8a99ad; font-size: 12px; font-weight: 500;">
+        Plattform-Standard v2026.1<br>
+        <span style="color: #ff5a00;">●</span> Live-Abgleich aktiv
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 # =========================================================
-# HEADER (ROBUST LOGOS WITH FALLBACK)
+# REQUIRED TEXT COMPONENT (EXACT TEXT WORDING)
 # =========================================================
-col1, col2, col3 = st.columns([1,2,1])
-
-with col1:
-    st.image("https://upload.wikimedia.org/wikipedia/commons/0/0c/ZDF_logo.svg", width=70)
-    st.caption("ZDF")
-
-with col2:
-    st.markdown("<div class='title' style='text-align:center;'>ZDFheute WhatsApp Artikel-Checker</div>", unsafe_allow_html=True)
-
-with col3:
-    st.image("https://upload.wikimedia.org/wikipedia/commons/6/6f/ZDFheute_Logo_2020.svg", width=100)
-    st.caption("ZDFheute")
-
-
-st.caption("by ZDF Digital News-Redaktion")
-
-st.markdown("---")
-
+st.markdown("""
+<div class="intro-container">
+    <div class="intro-text">
+        Dieses Tool analysiert ZDFheute-Artikel im gewählten Zeitraum, vergleicht sie mit einer 
+        Excel-Liste der Artikel, die auf dem WhatsApp-Kanal der ZDFheute liefen (anhand der piano-Excel-Datei) 
+        und zeigt dir nur die Inhalte, die noch nicht im WhatsApp-Kanal veröffentlicht wurden.
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 # =========================================================
-# DESCRIPTION
+# CONTROL PANEL (INTEGRATED & CLEAN UI SLEEK GRID)
 # =========================================================
-st.info("""
-Dieses Tool analysiert ZDFheute-Artikel im gewählten Zeitraum,
-vergleicht sie mit einer Excel-Liste und zeigt dir nur die Inhalte,
-die noch NICHT im WhatsApp-Kanal veröffentlicht wurden.
-""")
+st.markdown("<p style='font-weight: 600; font-size: 16px; margin-bottom: 5px; color: #ffffff;'>⚙️ Konfiguration & Datenquelle</p>", unsafe_allow_html=True)
 
-
-# =========================================================
-# FILE UPLOAD (FIXED - CORE MISSING FEATURE)
-# =========================================================
-st.subheader("📁 Excel Upload")
-file = st.file_uploader("Excel-Datei hochladen (Spalte 1 = Titel, optional Spalte 2 = URL)", type=["xlsx"])
-
-
-# =========================================================
-# DATE FILTER (REAL CONTROL)
-# =========================================================
-col1, col2 = st.columns(2)
-
-with col1:
-    start_date = st.date_input("Startdatum")
-
-with col2:
-    end_date = st.date_input("Enddatum")
-
-
-# =========================================================
-# CATEGORY ENGINE (IMPROVED PROMI + SERVICE + PANORAMA FIX)
-# =========================================================
-def categorize(title, url):
-
-    t = title.lower()
-    u = url.lower()
-
-    if "/politik" in u:
-        return "Macht und Folgen"
-
-    if "/ratgeber" in u:
-        return "Service & Alltag"
-
-    # TRUE CRIME / DRAMA
-    if any(x in t for x in ["mord","tat","gericht","polizei","kriminal","prozess"]):
-        return "Zwischen Tat und Aufklärung"
-
-    # PROMI / ENTERTAINMENT (FIXED PANORAMA ERROR)
-    if any(x in t for x in [
-        "promi","star","heidi","helene","klum","fischer","lindenberg",
-        "sänger","schauspieler","musik","film","serie","show"
-    ]):
-        return "Trends & Unterhaltung"
-
-    # SERVICE EXPANDED
-    if any(x in t for x in [
-        "essen","rezept","ernährung","gesundheit","geld","steuer",
-        "miete","rente","tipps","haushalt","verbraucher"
-    ]):
-        return "Service & Alltag"
-
-    if "/panorama" in u:
-        return "Gesellschaft & Alltag"
-
-    return "Sonstiges"
-
-
-# =========================================================
-# RSS FETCH
-# =========================================================
-@st.cache_data(ttl=600)
-def get_articles():
-
-    feeds = [
-        "https://www.zdf.de/rss/zdf/nachrichten",
-        "https://www.zdf.de/rss/zdf/politik",
-        "https://www.zdf.de/rss/zdf/wirtschaft",
-        "https://www.zdf.de/rss/zdf/panorama",
-        "https://www.zdf.de/rss/zdf/sport"
-    ]
-
-    articles = []
-
-    for feed in feeds:
-        try:
-            r = requests.get(feed, headers={"User-Agent": "Mozilla/5.0"})
-            root = ET.fromstring(r.content)
-
-            for item in root.findall(".//item"):
-
-                title = item.findtext("title")
-                link = item.findtext("link")
-
-                if not title or not link:
-                    continue
-
-                u = link.lower()
-
-                # HARD FILTERS (IMPORTANT)
-                if "/video" in u:
-                    continue
-                if "zdfheute.de/thema" in u:
-                    continue
-                if "phoenix.de" in u:
-                    continue
-
-                articles.append({
-                    "title": title,
-                    "url": link
-                })
-
-        except:
-            continue
-
-    return articles
-
-
-# =========================================================
-# MAIN
-# =========================================================
-if file:
-
-    df = pd.read_excel(file, engine="openpyxl")
-
-    excel_titles = set(df.iloc[:,0].astype(str).str.lower().str.strip())
-
-    excel_urls = set()
-    if df.shape[1] > 1:
-        excel_urls = set(df.iloc[:,1].astype(str).str.lower().str.strip())
-
-    articles = get_articles()
-
-    grouped = {}
-
-    for a in articles:
-
-        title = a["title"].lower().strip()
-        url = a["url"].lower().strip()
-
-        # EXCEL MATCH CHECK
-        if title in excel_titles or url in excel_urls:
-            continue
-
-        cat = categorize(title, url)
-
-        grouped.setdefault(cat, []).append(a)
-
-
-    # =========================================================
-    # KPI CALC
-    # =========================================================
-    total_missing = sum(len(v) for v in grouped.values())
-    categories = len(grouped)
-
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.markdown(f"<div class='kpi'><h2>{total_missing}</h2><p>Fehlende Artikel</p></div>", unsafe_allow_html=True)
-
-    with col2:
-        st.markdown(f"<div class='kpi'><h2>{categories}</h2><p>Kategorien</p></div>", unsafe_allow_html=True)
-
-
-    st.markdown("---")
-
-
-    # =========================================================
-    # OUTPUT
-    # =========================================================
-    for cat, items in grouped.items():
-
-        st.markdown(f"### {cat}")
-
-        for a in items:
-
-            st.markdown(f"""
-            <div class="card">
-                <b>{a['title']}</b><br>
-                <a href="{a['url']}" target="_blank">{a['url']}</a>
-            </div>
-            """, unsafe_allow_html=True)
+col_file, col_d1, col_
