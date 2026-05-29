@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 
 
 # =========================================================
-# HEADER (FINAL)
+# HEADER
 # =========================================================
 st.title("ZDFheute Whatsapp Artikel-Checker")
 st.caption("by ZDF Digital News-Redaktion")
@@ -16,17 +16,17 @@ Dieses Tool vergleicht eine Excel-Datei mit den im definierten Zeitraum veröffe
 
 
 # =========================================================
-# HARTE EXKLUSION (ABSOLUT VERBINDLICH)
+# HARTE EXKLUSION
 # =========================================================
 BLOCK_PREFIXES = [
     "https://www.zdfheute.de/briefing",
     "https://www.zdfheute.de/thema",
     "https://www.zdfheute.de/in-eigener-sache",
-    "https://www.zdfheute.de/video",
     "https://www.phoenix.de",
     "https://presseportal.zdf.de/pressemitteilungen",
     "https://www.zdf.de/dokus",
     "https://www.zdfheute.de/video",
+    "https://www.zdf.de/video",   # <<< WICHTIG FIX
 ]
 
 
@@ -42,7 +42,7 @@ C_OTHER = "Sonstiges"
 
 
 # =========================================================
-# KATEGORISIERUNG (FINAL VERSION)
+# KATEGORISIERUNG (FINAL + PROMI FIX)
 # =========================================================
 def categorize(title, url):
 
@@ -53,73 +53,72 @@ def categorize(title, url):
     if any(u.startswith(x) for x in BLOCK_PREFIXES):
         return None
 
-    # 2. URL PRIORITY RULES
+    # 2. POLITIK
     if "/politik" in u:
         return C_POLITICS
 
+    # 3. RATGEBER
     if "/ratgeber" in u:
         return C_SERVICE
 
-    # 3. PANORAMA (WICHTIGSTER FIX)
+    # 4. PANORAMA
     if "/panorama" in u:
 
-        # Crime / Events
         if any(x in t for x in [
             "unfall","explosion","feuer","rettung","mord",
-            "polizei","tat","anschlag","ermittlung","kriminalität"
+            "polizei","tat","anschlag","ermittlung","kriminal"
         ]):
             return C_CRIME
 
-        # Service-like Panorama
         if any(x in t for x in [
-            "gesundheit","hitze","wetter","tipps","ernährung",
-            "geld","kosten","energie"
+            "gesundheit","wetter","hitze","ernährung","geld",
+            "energie","kosten","tipps","haushalt"
         ]):
             return C_SERVICE
 
-        # Entertainment / Promi / Popkultur
+        # 🔥 PROMI / ENTERTAINMENT (STRIKT ERWEITERT)
         if any(x in t for x in [
-            "promi","star","stars","musik","film","serie",
-            "tv","show","konzert","instagram","tiktok",
-            "viral","trend","mode","fashion","sänger","schauspieler"
+            "promi","star","stars","sänger","schauspieler",
+            "musiker","moderator","model","heidi","helene",
+            "klum","fischer","lindenberg",
+            "film","serie","tv","show","konzert",
+            "instagram","tiktok","viral","trend","mode","fashion"
         ]):
             return C_ENTERTAINMENT
 
-        # Default Panorama
         return C_SOCIAL
 
-    # 4. CRIME GLOBAL
+    # 5. CRIME GLOBAL
     if any(x in t for x in [
         "polizei","gericht","mord","tat","verbrechen",
-        "prozess","urteil","ermittlung","anschlag","raub"
+        "prozess","urteil","ermittlung","anschlag"
     ]):
         return C_CRIME
 
-    # 5. SERVICE GLOBAL
+    # 6. SERVICE GLOBAL
     if any(x in t for x in [
         "rezept","kochen","ernährung","gesundheit","arzt",
         "geld","steuer","rente","miete","verbraucher",
-        "versicherung","energie","kosten","spar"
+        "energie","kosten","spar"
     ]):
         return C_SERVICE
 
-    # 6. POLITICS GLOBAL
+    # 7. POLITIK GLOBAL
     if any(x in t for x in [
         "politik","regierung","bundestag","wahl","eu","usa",
         "russland","china","krieg","konflikt","nato",
-        "analyse","einordnung","diplomatie"
+        "analyse","einordnung"
     ]):
         return C_POLITICS
 
-    # 7. ENTERTAINMENT GLOBAL
+    # 8. ENTERTAINMENT GLOBAL (PROMI SICHERHEIT)
     if any(x in t for x in [
-        "promi","star","musik","film","serie","tv",
-        "show","konzert","instagram","tiktok","viral",
-        "trend","mode","fashion"
+        "promi","star","musik","film","serie","tv","show",
+        "konzert","instagram","tiktok","viral","trend",
+        "mode","fashion","schauspiel","sänger","moderator"
     ]):
         return C_ENTERTAINMENT
 
-    # 8. FALLBACK (WICHTIG: NICHT VERLIEREN)
     return C_SOCIAL
 
 
@@ -153,6 +152,10 @@ def get_articles():
                     continue
 
                 u = link.lower()
+
+                # HARD BLOCK VIDEO (FINAL FIX)
+                if "/video" in u or "zdf.de/video" in u:
+                    continue
 
                 if any(u.startswith(x) for x in BLOCK_PREFIXES):
                     continue
@@ -216,6 +219,7 @@ if file:
         C_OTHER
     ]
 
+    # KEINE LIMITIERUNG MEHR → ALLES AUSGEBEN
     for cat in order:
         items = grouped.get(cat, [])
 
