@@ -46,7 +46,7 @@ p, li, span, label, .stMarkdown {
     align-items: center;
     padding: 30px 0 15px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    margin-bottom: 40px;
+    margin-bottom: 30px;
 }
 
 /* SCHIMMER-EFFEKT FÜR DIE TITEL-SCHRIFTEN */
@@ -76,7 +76,30 @@ p, li, span, label, .stMarkdown {
     vertical-align: middle;
 }
 
-/* Cleaner, randloser FileUploader */
+/* Ausführliche Infobox */
+.editorial-info-box {
+    background: #0d111c;
+    border-left: 3px solid #ff5a00;
+    padding: 22px;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 35px;
+}
+.info-headline {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 16px !important;
+    margin-bottom: 8px;
+}
+.info-list {
+    margin-top: 10px;
+    padding-left: 20px;
+}
+.info-list li {
+    font-size: 14px !important;
+    margin-bottom: 6px;
+}
+
+/* Cleaner, kontrastreicher FileUploader */
 [data-testid="stFileUploader"] {
     background: #0d111c !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -93,10 +116,11 @@ p, li, span, label, .stMarkdown {
     font-size: 15px !important;
 }
 
-/* Radikal vereinfachter, unaufdringlicher KPI Block */
+/* Schimmernder KPI Text-Block */
 .clean-kpi-container {
-    padding: 20px 0;
-    margin: 20px 0 30px 0;
+    padding: 25px 0;
+    margin: 25px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 .kpi-shimmer-number {
@@ -112,15 +136,15 @@ p, li, span, label, .stMarkdown {
 
 /* Redaktionelle Überschriften */
 .section-headline {
-    font-size: 16px !important;
+    font-size: 15px !important;
     font-weight: 700 !important;
     color: #64748b !important;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
     margin: 40px 0 15px 0;
 }
 
-/* Matte, extrem cleane News Cards */
+/* Matte News Cards */
 .news-card {
     background: #0d111c;
     border: 1px solid rgba(255, 255, 255, 0.03);
@@ -138,24 +162,22 @@ p, li, span, label, .stMarkdown {
     font-weight: 600 !important;
     color: #ffffff !important;
     margin-bottom: 6px;
-    letter-spacing: -0.2px;
 }
 .news-url-anchor {
     font-size: 13px !important;
     color: #64748b !important;
     text-decoration: none;
-    transition: color 0.2s ease;
 }
 .news-card:hover .news-url-anchor {
     color: #ff9e66 !important;
 }
 
-/* Minimalistischer Footer */
+/* Minimalistischer, dauerhafter Footer */
 .feedback-box {
     text-align: center;
     padding: 40px 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    margin-top: 70px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    margin-top: 80px;
 }
 .feedback-title {
     color: #ffffff !important;
@@ -171,7 +193,7 @@ header {visibility: hidden;}
 st.markdown(ui_styles, unsafe_allow_html=True)
 
 # =========================================================
-# LIVE ZEITSTEMPEL
+# LIVE ZEITSTEMPEL (DEUTSCH)
 # =========================================================
 jetzt_de = datetime.now().strftime("%d.%m.%Y - %H:%M:%S")
 
@@ -192,11 +214,19 @@ header_html = f"""
 st.markdown(header_html, unsafe_allow_html=True)
 
 # =========================================================
-# ERKLÄRUNGSTEXT (SUBTIL & CLEAN)
+# AUSFÜHRLICHE FUNKTIONSBESCHREIBUNG (DAUERHAFT SICHTBAR)
 # =========================================================
 st.markdown("""
-<div style="padding: 0 0 20px 0; color: #64748b !important; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px;">
-    Gegenabgleich der aktuellen ZDFheute-Artikel mit deiner exportierten Piano-Excel-Liste der bereits bespielten WhatsApp-Inhalte.
+<div class="editorial-info-box">
+    <div class="info-headline">System-Logik & Funktionsweise:</div>
+    <div style="font-size: 14.5px; color: #cbd5e1 !important; line-height: 1.6;">
+        Dieses Tool automatisiert den Abgleich zwischen aktuell auf der Website publizierten Inhalten und den bereits über WhatsApp distribuierten Artikeln. Ziel ist es, Lücken in der Distribution sofort zu identifizieren.
+    </div>
+    <ul class="info-list">
+        <li><strong>Echtzeit-Vergleich:</strong> Das Tool ruft die neuesten Artikel direkt über die offiziellen ZDFheute-RSS-Feeds ab und gleicht Überschriften sowie URLs rigoros gegen die hochgeladene Piano-Excel-Liste ab.</li>
+        <li><strong>Automatische Filterung:</strong> Formate, die systembedingt nicht für klassische WhatsApp-Text-Pushes infrage kommen (darunter Dokumentationen, Mediathek-Videos, Lottozahlen, Briefings, Themenseiten sowie Phoenix-Inhalte), werden automatisch aussortiert.</li>
+        <li><strong>Präzise Kategorisierung (2026 Update):</strong> Die Sortierung erfolgt über ein intelligentes Prioritäten-Matching. Dadurch werden beispielsweise Unwetterwarnungen und Wetterberichte treffsicher in <em>"Gut zu wissen"</em> einsortiert und prominente Personen (z. B. Helene Fischer) landen sicher in <em>"Trends, Pop & Kurioses"</em>, anstatt fälschlicherweise der Politik zugeordnet zu werden.</li>
+    </ul>
 </div>
 """, unsafe_allow_html=True)
 
@@ -206,7 +236,7 @@ st.markdown("""
 col_file, col_d1, col_d2 = st.columns([2, 1, 1])
 
 with col_file:
-    file = st.file_uploader("Hier Excel-Datei hochladen", type=["xlsx"])
+    file = st.file_uploader("Hier Piano-Excel-Datei hochladen", type=["xlsx"])
 
 with col_d1:
     start_date = st.date_input("Startdatum", value=date.today(), format="DD.MM.YYYY")
@@ -244,9 +274,11 @@ def categorize(title, url):
     t = title.lower().strip()
     u = url.lower().strip()
 
+    # PRIORITÄT 1: Wetter & Unwetter (strikt in Service)
     if "wetter" in t or "gewitter" in t or "hitzewelle" in t or "unwetter" in t or "regen" in t:
         return "Gut zu wissen"
 
+    # PRIORITÄT 2: Trends, Pop & Kurioses (Fängt Promis ab)
     pop_keywords = [
         "promi", "star", "heidi", "helene", "klum", "fischer", "lindenberg", "sänger", 
         "schauspieler", "musik", "film", "serie", "show", "kino", "festival", "tiktok", 
@@ -255,6 +287,7 @@ def categorize(title, url):
     if "zdfheute.de/panorama/prominente" in u or any(x in t for x in pop_keywords):
         return "Trends, Pop & Kurioses"
 
+    # PRIORITÄT 3: Zwischen Tat und Aufklärung (Kriminalität)
     crime_keywords = [
         "mord", "tat", "gericht", "polizei", "kriminal", "prozess", "anklage", "festnahme", 
         "ermittlung", "fahndung", "raub", "diebstahl", "schüsse", "toter", "leiche", "opfer", 
@@ -380,11 +413,14 @@ if file:
     if not has_results:
         st.markdown('<div style="color:#2ed573; font-size:14px; font-weight:500; padding:20px 0;">✔ Alle Artikel wurden bereits über den WhatsApp-Kanal ausgespielt.</div>', unsafe_allow_html=True)
 
-else:
-    # Minimalistischer Footer im Wartezustand
-    st.markdown("""
-    <div class="feedback-box">
-        <div class="feedback-title">Du hast Feedback oder dir ist etwas aufgefallen? <span style="color:#ff5a00;">🧡</span></div>
-        <div class="feedback-text" style="margin-top:6px; font-size:13px !important;">Schreibe deine Anmerkungen jederzeit direkt an <strong>Matthias Schmickl</strong>.</div>
+# =========================================================
+# DAUERHAFTER FEEDBACK FOOTER (IMMER SICHTBAR)
+# =========================================================
+st.markdown("""
+<div class="feedback-box">
+    <div class="feedback-title">Du hast Feedback oder dir ist etwas aufgefallen? <span style="color:#ff5a00;">🧡</span></div>
+    <div class="feedback-text" style="margin-top:6px; font-size:13px !important; color: #64748b !important;">
+        Schreibe oder schicke deine Anmerkungen jederzeit direkt an <strong>Matthias Schmickl</strong>.
     </div>
-    """, unsafe_allow_html=True)
+</div>
+""", unsafe_allow_html=True)
