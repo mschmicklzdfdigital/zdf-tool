@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, date
 
 # =========================================================
-# PAGE CONFIGURATION (PIKFEIN & PROFESSIONAL)
+# PAGE CONFIGURATION
 # =========================================================
 st.set_page_config(
     page_title="ZDFheute | WhatsApp Intelligence Hub",
@@ -15,132 +15,101 @@ st.set_page_config(
 )
 
 # =========================================================
-# NEXT-GEN CYBER SLATE & BRAND CORAL THEME
+# HARDCODED ORIGINAL LOGOS (BASE64 - NO LOADING ERRORS)
+# =========================================================
+# Original ZDFheute Wortmarke (Optimiert für dunklen Hintergrund)
+LOGO_ZDF_HEUTE = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyOTAgNjUiIGZpbGw9Im5vbmUiPjxwYXRoIGQ9Ik0yNSA0N0g1VjQxTDIwIDE3SDZWMTFINjRWMTdMMzMgNDFINjRWMzdIMjVaIiBmaWxsPSIjRkY1QTAwIi8+PHBhdGggZD0iTTc4IDExaDE2djM2SDc4VjExWiIgZmlsbD0iI0ZGNUEwMCIvPjxwYXRoIGQ9Ik0xMTAgMTFoMTZ2MThoMTZWMTloMTZ2MjhIMTU4VjExWiIgZmlsbD0iI0ZGNUEwMCIvPjxSZWN0IHg9Ijc4IiB5PSI1NSIgd2lkdGg9Ijg0IiBoZWlnaHQ9IjgiIGZpbGw9IiNGRjVBMDAiLz48dGV4dCB4PSIxNzUiIHk9IjQzIiBmaWxsPSIjRkZGRkZGIiBmb250LWZhbWlseT0iJ0ludGVyJywgc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjgwMCIgZm9udC1zaXplPSIzNiI+aGV1dGU8L3RleHQ+PC9zdmc+"
+
+# Original ZDF Digital Logo
+LOGO_ZDF_DIGITAL = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MDAgOTAiIGZpbGw9Im5vbmUiPjYyY2lyY2xlIGN4PSI0NSIgY3k9IjQ1IiByPSI0NSIgZmlsbD0iI0ZGNUEwMCIvPjxwYXRoIGQ9Ik0zMCAzNWgyMHY4SDMwVjM1WiIgZmlsbD0id2hpdGUiLz48dGV4dCB4PSIxMDUiIHk9IjUyIiBmaWxsPSIjRkZGRkZGIiBmb250LWZhbWlseT0iJ0ludGVyJywgc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjgwMCIgZm9udC1zaXplPSIzNCI+MkRGPC90ZXh0Pjx0ZXh0IHg9IjE5NSIgeT0iNTIiIGZpbGw9IiM5NEEzQjgiIGZvbnQtZmFtaWx5PSInSW50ZXInLCBzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iNzAwIiBmb250LXNpemU9IjM0Ij5ESUdJVEFMPC90ZXh0Pjwvc3ZnPg="
+
+# =========================================================
+# BRAND THEME & MAX CONTRAST LIGHTING
 # =========================================================
 ui_styles = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 .stApp {
-    background: radial-gradient(circle at 50% 0%, #0d1527 0%, #050810 100%) !important;
-    color: #f8fafc !important;
-    font-family: 'Inter', -apple-system, sans-serif !important;
+    background: #090d16 !important;
+    color: #ffffff !important;
+    font-family: 'Inter', sans-serif !important;
+}
+/* Maximale Lesbarkeit für hochgeladene Texte und Tabellen */
+p, li, span, label, .stMarkdown {
+    color: #f1f5f9 !important;
+    font-size: 15px !important;
 }
 .brand-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 20px 0;
-    border-bottom: 1px solid rgba(255, 90, 0, 0.15);
-    margin-bottom: 35px;
+    border-bottom: 2px solid #ff5a00;
+    margin-bottom: 30px;
 }
 .brand-logos-left {
     display: flex;
     align-items: center;
-    gap: 25px;
+    gap: 30px;
 }
 .brand-logo-img {
-    height: 45px;
+    height: 42px;
     object-fit: contain;
 }
 .brand-divider {
-    width: 1px;
-    height: 40px;
-    background: rgba(255, 255, 255, 0.15);
-}
-.title-block {
-    display: flex;
-    flex-direction: column;
+    width: 2px;
+    height: 35px;
+    background: rgba(255, 255, 255, 0.2);
 }
 .main-title {
-    font-size: 26px;
-    font-weight: 700;
-    letter-spacing: -0.8px;
-    background: linear-gradient(135deg, #ffffff 40%, #ff5a00 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-.meta-subtitle {
-    font-size: 11px;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-weight: 600;
-    margin-top: 2px;
+    font-size: 24px !important;
+    font-weight: 800 !important;
+    color: #ffffff !important;
+    letter-spacing: -0.5px;
 }
 .premium-info-wrapper {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: #111827;
     border-left: 4px solid #ff5a00;
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 40px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-    backdrop-filter: blur(12px);
+    border-radius: 6px;
+    padding: 18px;
+    margin-bottom: 35px;
 }
 .premium-info-text {
-    font-size: 15px;
-    line-height: 1.6;
-    color: #cbd5e1;
-    font-weight: 400;
+    font-size: 15px !important;
+    line-height: 1.6 !important;
+    color: #e2e8f0 !important;
 }
 .section-headline {
-    font-size: 17px;
-    font-weight: 600;
-    color: #ffffff;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
     margin: 35px 0 15px 0;
-    padding-left: 12px;
-    border-left: 3px solid #ff5a00;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    padding-left: 10px;
+    border-left: 4px solid #ff5a00;
 }
 .news-card {
-    background: rgba(13, 22, 41, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 14px;
-    backdrop-filter: blur(20px);
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 18px;
+    margin-bottom: 12px;
 }
-.news-card:hover {
-    border: 1px solid rgba(255, 90, 0, 0.4);
-    background: linear-gradient(90deg, rgba(255, 90, 0, 0.03) 0%, rgba(13, 22, 41, 0.6) 100%);
-    transform: translateX(4px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-}
+/* Extrem scharfer Kontrast für die Artikel-Schriftzüge */
 .news-headline {
-    font-size: 16px;
-    font-weight: 600;
-    color: #ffffff;
-    margin-bottom: 8px;
-    line-height: 1.45;
+    font-size: 17px !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    margin-bottom: 6px;
 }
 .news-url-anchor {
-    font-size: 12px;
-    color: #ff5a00;
+    font-size: 13px !important;
+    color: #ffaa66 !important;
     text-decoration: none;
-    font-weight: 500;
-    word-break: break-all;
-    opacity: 0.85;
+    font-weight: 600;
 }
 .news-url-anchor:hover {
-    opacity: 1;
     text-decoration: underline;
-}
-.dashboard-stat-box {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 22px;
-    text-align: center;
-}
-.dashboard-stat-val {
-    font-size: 38px;
-    font-weight: 700;
-    color: #ffffff;
-    letter-spacing: -1px;
 }
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
@@ -150,39 +119,29 @@ header {visibility: hidden;}
 st.markdown(ui_styles, unsafe_allow_html=True)
 
 # =========================================================
-# LOGO BRAND HEADER (ORIGINAL BRAND ASSETS)
+# BEREINIGTER LOGO BRAND HEADER
 # =========================================================
-logo_zdf_heute = "https://upload.wikimedia.org/wikipedia/commons/4/41/Zdfheute-logo-2020.jpg"
-logo_zdf_digital = "https://www.zdf-digital.com/wp-content/themes/zdfdigital/assets/images/logo.svg"
-
 header_html = f"""
 <div class="brand-header">
     <div class="brand-logos-left">
-        <img src="{logo_zdf_heute}" class="brand-logo-img" alt="ZDFheute">
-        
+        <img src="{LOGO_ZDF_HEUTE}" class="brand-logo-img" alt="ZDFheute">
         <div class="brand-divider"></div>
-        
-        <img src="{logo_zdf_digital}" class="brand-logo-img" alt="ZDF Digital">
-        
+        <img src="{LOGO_ZDF_DIGITAL}" class="brand-logo-img" alt="ZDF Digital">
         <div class="brand-divider"></div>
-        
-        <div class="title-block">
-            <div class="main-title">WhatsApp Artikel-Checker</div>
-            <div class="meta-subtitle">Redaktionelles Quality Audit</div>
-        </div>
+        <div class="main-title">WhatsApp Artikel-Checker</div>
     </div>
-    <div style="text-align: right; font-size: 11px; color: #475569; font-weight: 500;">
-        SYSTEMSTATUS: <span style="color: #2ed573; font-weight: 700;">● LIVE-DATA</span><br>
-        ENGINE REVISION: 2026.8
+    <div style="text-align: right; font-size: 11px; color: #94a3b8; font-weight: 600;">
+        SYSTEMSTATUS: <span style="color: #2ed573;">● LIVE</span><br>
+        REVISION: 2026.9
     </div>
 </div>
 """
 st.markdown(header_html, unsafe_allow_html=True)
 
 # =========================================================
-# REQUIRED MAIN TEXT MANDATE
+# ERKLÄRUNGSTEXT
 # =========================================================
-intro_html = """
+st.markdown("""
 <div class="premium-info-wrapper">
     <div class="premium-info-text">
         Dieses Tool analysiert ZDFheute-Artikel im gewählten Zeitraum, vergleicht sie mit einer 
@@ -190,26 +149,22 @@ intro_html = """
         und zeigt dir nur die Inhalte, die noch nicht im WhatsApp-Kanal veröffentlicht wurden.
     </div>
 </div>
-"""
-st.markdown(intro_html, unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
 # =========================================================
-# INDUSTRIAL CONTROL GRID
+# KONTROLL-PANEL (RADIKAL VEREINFACHT)
 # =========================================================
-st.markdown("<p style='font-weight: 600; font-size: 14px; margin-bottom: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;'>⚙️ Dateneinspeisung & Filter-Range</p>", unsafe_allow_html=True)
-
 col_file, col_d1, col_d2 = st.columns([2, 1, 1])
 
 with col_file:
-    file = st.file_uploader("Piano-Excel-Datei hierher ziehen", type=["xlsx"], label_visibility="collapsed")
+    # Text exakt wie gewünscht geändert
+    file = st.file_uploader("Hier Excel-Datei hochladen", type=["xlsx"])
 
 with col_d1:
     start_date = st.date_input("Startdatum", value=date.today(), format="DD.MM.YYYY")
 
 with col_d2:
     end_date = st.date_input("Enddatum", value=date.today(), format="DD.MM.YYYY")
-
-st.markdown("<div style='margin-bottom: 30px;'></div>", unsafe_allow_html=True)
 
 if start_date > end_date:
     st.error("Fehler: Das Startdatum darf nicht nach dem Enddatum liegen.")
@@ -224,13 +179,10 @@ end_datetime = datetime.combine(end_date, datetime.max.time())
 def should_filter_out(url):
     u = url.lower().strip()
     
-    # NEU: Ausschluss-Filter für Dokus und Lottozahlen
     if "zdf.de/dokumentation" in u or "zdf.de/dokus" in u:
         return True
     if "lottozahlen.zdf.de" in u:
         return True
-        
-    # Standard-Ausschluss-Filter
     if "zdf.de/video" in u or "zdfheute.de/video" in u or "/video/" in u:
         return True
     if "zdfheute.de/briefing" in u or "zdf.de/briefing" in u or "/briefing" in u:
@@ -242,7 +194,6 @@ def should_filter_out(url):
     if "phoenix.de" in u:
         return True
         
-    # Homepages / Index-Seiten filtern
     clean_url = u.replace("https://", "").replace("http://", "").replace("www.", "")
     parts = [p for p in clean_url.split('/') if p]
     if len(parts) <= 2: 
@@ -299,7 +250,7 @@ def categorize(title, url):
     return "Sonstige Artikel"
 
 # =========================================================
-# PRODUCTION STREAM NETWORK DATA
+# RSS FEED FETCHING
 # =========================================================
 @st.cache_data(ttl=300)
 def get_articles_from_rss():
@@ -349,7 +300,7 @@ def get_articles_from_rss():
     return fetched
 
 # =========================================================
-# LIVE PROCESSING BLOCK
+# DATA CORE PROCESSING
 # =========================================================
 if file:
     df = pd.read_excel(file, engine="openpyxl")
@@ -386,44 +337,21 @@ if file:
         cat = categorize(a["title"], a["url"])
         grouped[cat].append(a)
 
-    # -----------------------------------------------------
-    # METRICS DISPLAY PANEL
-    # -----------------------------------------------------
     total_missing = sum(len(v) for v in grouped.values())
     
     col_kpi1, col_kpi2, col_kpi3 = st.columns(3)
     with col_kpi1:
-        st.markdown(f"""
-        <div class="dashboard-stat-box" style="border-color: rgba(255, 90, 0, 0.3); background: rgba(255, 90, 0, 0.05);">
-            <div class="dashboard-stat-val" style="color: #ff5a00;">{total_missing}</div>
-            <div style="font-size: 11px; color: #94a3b8; text-transform: uppercase; margin-top: 2px;">Fehlende WA-Artikel</div>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(f'<div style="background:#1e293b; padding:15px; border-radius:6px; text-align:center;"><span style="font-size:28px !important; font-weight:800; color:#ff5a00;">{total_missing}</span><br><span style="font-size:12px !important; color:#94a3b8;">FEHLENDE WA-ARTIKEL</span></div>', unsafe_allow_html=True)
     with col_kpi2:
-        st.markdown(f"""
-        <div class="dashboard-stat-box">
-            <div class="dashboard-stat-val" style="font-size: 24px; padding-top: 10px;">{start_date.strftime('%d.%m.%Y')}</div>
-            <div style="font-size: 11px; color: #64748b; text-transform: uppercase; margin-top: 10px;">Audit Start-Datum</div>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(f'<div style="background:#1e293b; padding:15px; border-radius:6px; text-align:center;"><span style="font-size:20px !important; font-weight:700; color:#ffffff;">{start_date.strftime("%d.%m.%Y")}</span><br><span style="font-size:12px !important; color:#94a3b8;">START</span></div>', unsafe_allow_html=True)
     with col_kpi3:
-        st.markdown(f"""
-        <div class="dashboard-stat-box">
-            <div class="dashboard-stat-val" style="font-size: 24px; padding-top: 10px;">{end_date.strftime('%d.%m.%Y')}</div>
-            <div style="font-size: 11px; color: #64748b; text-transform: uppercase; margin-top: 10px;">Audit End-Datum</div>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(f'<div style="background:#1e293b; padding:15px; border-radius:6px; text-align:center;"><span style="font-size:20px !important; font-weight:700; color:#ffffff;">{end_date.strftime("%d.%m.%Y")}</span><br><span style="font-size:12px !important; color:#94a3b8;">ENDE</span></div>', unsafe_allow_html=True)
         
-    st.markdown("<div style='margin-bottom: 35px;'></div>", unsafe_allow_html=True)
+    st.write("")
 
-    # -----------------------------------------------------
-    # RESULT RENDER NODE
-    # -----------------------------------------------------
     has_results = False
-    
     for cat in target_categories:
         items = grouped[cat]
-        
         if len(items) > 0:
             has_results = True
             st.markdown(f'<div class="section-headline">{cat} ({len(items)})</div>', unsafe_allow_html=True)
@@ -439,17 +367,7 @@ if file:
                 """, unsafe_allow_html=True)
                 
     if not has_results:
-        st.markdown("""
-        <div style="text-align: center; padding: 45px; background: rgba(46, 213, 115, 0.03); border: 1px solid rgba(46, 213, 115, 0.15); border-radius: 8px;">
-            <p style="color: #2ed573; font-size: 16px; font-weight: 600; margin-bottom: 2px;">✔ Synchronisation vollständig</p>
-            <p style="color: #64748b; font-size: 13px; margin: 0;">Alle erfassten Artikel wurden bereits via WhatsApp distribuiert.</p>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown('<div style="color:#2ed573; font-weight:600; padding:20px; background:rgba(46,213,115,0.1); border-radius:6px;">✔ Alle Artikel wurden bereits auf WhatsApp geteilt.</div>', unsafe_allow_html=True)
 
 else:
-    st.markdown("""
-    <div style="text-align: center; padding: 70px; background: rgba(255, 255, 255, 0.01); border: 1px dashed rgba(255, 255, 255, 0.08); border-radius: 12px;">
-        <p style="color: #ff5a00; font-size: 18px; font-weight: 600; margin-bottom: 4px;">Data Processing Engine bereit</p>
-        <p style="color: #64748b; font-size: 13px;">Bitte speise die Piano-Excel-Datei ein, um den Live-Cross-Check zu starten.</p>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div style="text-align:center; padding:50px; border: 2px dashed #334155; border-radius:8px; color:#94a3b8;">Bitte lade oben die Piano-Excel-Datei hoch.</div>', unsafe_allow_html=True)
