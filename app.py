@@ -2,17 +2,55 @@ import streamlit as st
 import pandas as pd
 import requests
 import xml.etree.ElementTree as ET
+import re
+import unicodedata
 
 
 # =========================================================
-# HEADER
+# PAGE CONFIG (NEU: LOOK & FEEL)
 # =========================================================
-st.title("ZDFheute Whatsapp Artikel-Checker")
-st.caption("by ZDF Digital News-Redaktion")
+st.set_page_config(
+    page_title="ZDFheute WhatsApp Checker",
+    layout="wide"
+)
 
+
+# =========================================================
+# HEADER AREA (UI UPGRADE)
+# =========================================================
+col1, col2, col3 = st.columns([1, 2, 1])
+
+with col2:
+    st.title("ZDFheute Whatsapp Artikel-Checker")
+    st.caption("by ZDF Digital News-Redaktion")
+
+st.markdown("---")
+
+
+# Logos (Platzhalter – kannst du jederzeit ersetzen)
+logo_col1, logo_col2 = st.columns(2)
+
+with logo_col1:
+    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/ZDF_logo.svg/512px-ZDF_logo.svg.png", width=140)
+
+with logo_col2:
+    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/ZDFheute_logo.svg/512px-ZDFheute_logo.svg.png", width=140)
+
+st.markdown("---")
+
+
+# =========================================================
+# DESCRIPTION
+# =========================================================
 st.markdown("""
 Dieses Tool vergleicht eine Excel-Datei mit den im definierten Zeitraum veröffentlichten ZDFheute-Artikeln, identifiziert die Inhalte, die noch nicht im WhatsApp-Kanal erschienen sind, und ordnet sie automatisch in thematische Kategorien ein. Feedback kann gerne an Matthias Schmickl gegeben werden.
 """)
+
+
+# =========================================================
+# UPLOAD (FIX: TEXT ENTFERNT)
+# =========================================================
+file = st.file_uploader("Excel hochladen")
 
 
 # =========================================================
@@ -26,8 +64,30 @@ BLOCK_PREFIXES = [
     "https://presseportal.zdf.de/pressemitteilungen",
     "https://www.zdf.de/dokus",
     "https://www.zdfheute.de/video",
-    "https://www.zdf.de/video",   # <<< WICHTIG FIX
+    "https://www.zdf.de/video",
 ]
+
+
+# =========================================================
+# NORMALISIERUNG
+# =========================================================
+def normalize_text(t: str) -> str:
+    if not isinstance(t, str):
+        return ""
+    t = t.lower().strip()
+    t = unicodedata.normalize("NFKD", t)
+    t = re.sub(r"\s+", " ", t)
+    t = re.sub(r"[^\w\s]", "", t)
+    return t
+
+
+def normalize_url(u: str) -> str:
+    if not isinstance(u, str):
+        return ""
+    u = u.lower().strip()
+    u = u.split("?")[0]
+    u = u.rstrip("/")
+    return u
 
 
 # =========================================================
@@ -42,26 +102,22 @@ C_OTHER = "Sonstiges"
 
 
 # =========================================================
-# KATEGORISIERUNG (FINAL + PROMI FIX)
+# KATEGORISIERUNG
 # =========================================================
 def categorize(title, url):
 
     t = title.lower()
     u = url.lower()
 
-    # 1. HARD EXCLUSION
     if any(u.startswith(x) for x in BLOCK_PREFIXES):
         return None
 
-    # 2. POLITIK
     if "/politik" in u:
         return C_POLITICS
 
-    # 3. RATGEBER
     if "/ratgeber" in u:
         return C_SERVICE
 
-    # 4. PANORAMA
     if "/panorama" in u:
 
         if any(x in t for x in [
@@ -72,30 +128,26 @@ def categorize(title, url):
 
         if any(x in t for x in [
             "gesundheit","wetter","hitze","ernährung","geld",
-            "energie","kosten","tipps","haushalt"
+            "energie","kosten","tipps","haushalt","rezept"
         ]):
             return C_SERVICE
 
-        # 🔥 PROMI / ENTERTAINMENT (STRIKT ERWEITERT)
         if any(x in t for x in [
-            "promi","star","stars","sänger","schauspieler",
-            "musiker","moderator","model","heidi","helene",
-            "klum","fischer","lindenberg",
-            "film","serie","tv","show","konzert",
+            "promi","star","stars","heidi","helene","klum","fischer",
+            "lindenberg","sänger","schauspieler","musiker","moderator",
+            "film","serie","tv","show","konzert","musik",
             "instagram","tiktok","viral","trend","mode","fashion"
         ]):
             return C_ENTERTAINMENT
 
         return C_SOCIAL
 
-    # 5. CRIME GLOBAL
     if any(x in t for x in [
         "polizei","gericht","mord","tat","verbrechen",
         "prozess","urteil","ermittlung","anschlag"
     ]):
         return C_CRIME
 
-    # 6. SERVICE GLOBAL
     if any(x in t for x in [
         "rezept","kochen","ernährung","gesundheit","arzt",
         "geld","steuer","rente","miete","verbraucher",
@@ -103,7 +155,6 @@ def categorize(title, url):
     ]):
         return C_SERVICE
 
-    # 7. POLITIK GLOBAL
     if any(x in t for x in [
         "politik","regierung","bundestag","wahl","eu","usa",
         "russland","china","krieg","konflikt","nato",
@@ -111,15 +162,14 @@ def categorize(title, url):
     ]):
         return C_POLITICS
 
-    # 8. ENTERTAINMENT GLOBAL (PROMI SICHERHEIT)
     if any(x in t for x in [
         "promi","star","musik","film","serie","tv","show",
         "konzert","instagram","tiktok","viral","trend",
-        "mode","fashion","schauspiel","sänger","moderator"
+        "mode","fashion"
     ]):
         return C_ENTERTAINMENT
 
-    return C_SOCIAL
+    return C_OTHER
 
 
 # =========================================================
@@ -153,8 +203,7 @@ def get_articles():
 
                 u = link.lower()
 
-                # HARD BLOCK VIDEO (FINAL FIX)
-                if "/video" in u or "zdf.de/video" in u:
+                if "/video" in u:
                     continue
 
                 if any(u.startswith(x) for x in BLOCK_PREFIXES):
@@ -172,19 +221,21 @@ def get_articles():
 
 
 # =========================================================
-# UPLOAD
-# =========================================================
-file = st.file_uploader("Excel hochladen (erste Spalte = Titel)")
-
-
-# =========================================================
 # MAIN
 # =========================================================
 if file:
 
     df = pd.read_excel(file, engine="openpyxl")
 
-    excel_titles = set(df.iloc[:,0].astype(str).str.lower().str.strip())
+    excel_titles = set()
+    excel_urls = set()
+
+    for t in df.iloc[:, 0].astype(str):
+        excel_titles.add(normalize_text(t))
+
+    if df.shape[1] > 1:
+        for u in df.iloc[:, 1].astype(str):
+            excel_urls.add(normalize_url(u))
 
     articles = get_articles()
 
@@ -193,19 +244,20 @@ if file:
 
     for a in articles:
 
-        title = a["title"].lower().strip()
+        url_norm = normalize_url(a["url"])
+        title_norm = normalize_text(a["title"])
 
-        if title in seen:
+        if url_norm in seen:
             continue
-        seen.add(title)
+        seen.add(url_norm)
 
-        if title in excel_titles:
+        if url_norm in excel_urls:
             continue
 
         cat = categorize(a["title"], a["url"])
 
         if not cat:
-            continue
+            cat = C_OTHER
 
         grouped.setdefault(cat, []).append(a)
 
@@ -219,7 +271,7 @@ if file:
         C_OTHER
     ]
 
-    # KEINE LIMITIERUNG MEHR → ALLES AUSGEBEN
+
     for cat in order:
         items = grouped.get(cat, [])
 
