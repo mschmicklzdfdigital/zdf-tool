@@ -15,165 +15,152 @@ st.set_page_config(
 )
 
 # =========================================================
-# HIGH-END ORANGE CYBERPUNK THEME (2026 RADICAL DESIGN)
+# BERLIN MINIMALIST DARK THEME (HIGH-END EDITORIAL 2026)
 # =========================================================
 ui_styles = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-/* Deep Orbit Background mit starkem Fokus auf Orange-Akzente */
+/* Absolut flacher, einfarbiger High-Fashion-Hintergrund */
 .stApp {
-    background: radial-gradient(circle at 80% 10%, rgba(255, 90, 0, 0.08) 0%, #060913 60%, #020306 100%) !important;
-    color: #f8fafc !important;
+    background-color: #05070c !important;
+    color: #f1f5f9 !important;
     font-family: 'Plus Jakarta Sans', sans-serif !important;
 }
 
-/* Custom Scrollbar im glühenden Orange-Stil */
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: #060913; }
-::-webkit-scrollbar-thumb { background: rgba(255, 90, 0, 0.3); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #ff5a00; box-shadow: 0 0 10px #ff5a00; }
+/* Dezent angepasste Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #05070c; }
+::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #ff5a00; }
 
 p, li, span, label, .stMarkdown {
-    color: #cbd5e1 !important;
+    color: #94a3b8 !important;
     font-size: 15px !important;
 }
 
-/* Brutalistischer, cleaner Brand-Header */
+/* Messerscharfer, cleaner Header */
 .brand-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 25px 0;
-    border-bottom: 3px solid #ff5a00;
-    margin-bottom: 35px;
-    box-shadow: 0 4px 30px rgba(255, 90, 0, 0.1);
-}
-.main-title {
-    font-size: 30px !important;
-    font-weight: 800 !important;
-    color: #ffffff !important;
-    letter-spacing: -1.5px;
-}
-.orange-glow-text {
-    color: #ff5a00 !important;
-    text-shadow: 0 0 15px rgba(255, 90, 0, 0.6);
+    padding: 30px 0 15px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 40px;
 }
 
-/* Pulsierender deutscher Live-Status */
-.live-dot {
+/* SCHIMMER-EFFEKT FÜR DIE TITEL-SCHRIFTEN */
+.shimmer-title {
+    font-size: 28px !important;
+    font-weight: 800 !important;
+    letter-spacing: -1.2px;
+    background: linear-gradient(120deg, #ffffff 30%, #ff7a22 50%, #ffffff 70%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 4s linear infinite;
+}
+
+@keyframes shine {
+    to { background-position: 200% center; }
+}
+
+/* Minimalistischer Pulser */
+.live-dot-de {
     display: inline-block;
-    width: 10px;
-    height: 10px;
+    width: 6px;
+    height: 6px;
     background-color: #ff5a00;
     border-radius: 50%;
     margin-right: 8px;
-    box-shadow: 0 0 12px #ff5a00;
-    animation: pulseGlow 1.5s infinite;
-}
-@keyframes pulseGlow {
-    0% { transform: scale(0.9); opacity: 0.5; }
-    50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 18px #ff5a00; }
-    100% { transform: scale(0.9); opacity: 0.5; }
+    vertical-align: middle;
 }
 
-/* Ultramoderner Dateiuploader (Voller Kontrast, Orange Border) */
+/* Cleaner, randloser FileUploader */
 [data-testid="stFileUploader"] {
-    background: rgba(15, 23, 42, 0.8) !important;
-    border: 2px solid #ff5a00 !important;
-    box-shadow: 0 0 20px rgba(255, 90, 0, 0.1);
-    border-radius: 12px !important;
-    padding: 20px !important;
-    transition: all 0.3s ease;
+    background: #0d111c !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 8px !important;
+    padding: 18px !important;
+    transition: border-color 0.2s ease;
 }
 [data-testid="stFileUploader"]:hover {
-    box-shadow: 0 0 30px rgba(255, 90, 0, 0.25);
-    background: rgba(255, 90, 0, 0.02) !important;
+    border-color: #ff5a00 !important;
 }
 [data-testid="stFileUploader"] label p {
     color: #ffffff !important;
-    font-weight: 800 !important;
-    font-size: 16px !important;
+    font-weight: 700 !important;
+    font-size: 15px !important;
 }
 
-/* Massives, fettes KPI Dashboard Centerpiece */
-.center-kpi-box {
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.8) 100%);
-    border: 2px solid rgba(255, 90, 0, 0.3);
-    border-radius: 16px;
-    padding: 30px;
-    text-align: center;
-    margin: 25px 0 40px 0;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+/* Radikal vereinfachter, unaufdringlicher KPI Block */
+.clean-kpi-container {
+    padding: 20px 0;
+    margin: 20px 0 30px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
-.kpi-massive-number {
-    font-size: 56px !important;
-    font-weight: 900;
-    color: #ff5a00 !important;
-    line-height: 1;
-    letter-spacing: -2px;
-    filter: drop-shadow(0 0 20px rgba(255, 90, 0, 0.5));
+.kpi-shimmer-number {
+    font-size: 38px !important;
+    font-weight: 800;
+    letter-spacing: -1px;
+    background: linear-gradient(90deg, #ff5a00 0%, #ff9e66 50%, #ff5a00 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 5s linear infinite;
 }
 
-/* Scharfe Kategorie-Überschriften */
+/* Redaktionelle Überschriften */
 .section-headline {
-    font-size: 20px !important;
-    font-weight: 800 !important;
-    color: #ffffff !important;
-    letter-spacing: -0.5px;
-    margin: 45px 0 20px 0;
-    padding-left: 14px;
-    border-left: 5px solid #ff5a00;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #64748b !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 40px 0 15px 0;
 }
 
-/* Glow-Karten für News mit heftigem Hover-Effekt */
+/* Matte, extrem cleane News Cards */
 .news-card {
-    background: rgba(20, 30, 54, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-left: 4px solid #ff5a00;
-    border-radius: 10px;
-    padding: 22px;
-    margin-bottom: 16px;
-    transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+    background: #0d111c;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    border-radius: 6px;
+    padding: 20px;
+    margin-bottom: 12px;
+    transition: all 0.2s ease;
 }
 .news-card:hover {
-    border-left-width: 8px;
-    background: linear-gradient(95deg, rgba(255, 90, 0, 0.06) 0%, rgba(20, 30, 54, 0.9) 100%);
-    transform: translateX(8px);
-    box-sizing: border-box;
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5), 0 0 25px rgba(255, 90, 0, 0.15);
+    border-color: rgba(255, 90, 0, 0.3);
+    transform: translateY(-1px);
 }
 .news-headline {
-    font-size: 18px !important;
-    font-weight: 700 !important;
+    font-size: 17px !important;
+    font-weight: 600 !important;
     color: #ffffff !important;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
+    letter-spacing: -0.2px;
 }
 .news-url-anchor {
     font-size: 13px !important;
-    color: #ffaa66 !important;
+    color: #64748b !important;
     text-decoration: none;
-    font-weight: 600;
+    transition: color 0.2s ease;
 }
-.news-url-anchor:hover {
-    color: #ff5a00 !important;
-    text-decoration: underline;
+.news-card:hover .news-url-anchor {
+    color: #ff9e66 !important;
 }
 
-/* Feedback Box */
+/* Minimalistischer Footer */
 .feedback-box {
     text-align: center;
-    padding: 45px;
-    border: 2px dashed rgba(255, 90, 0, 0.3);
-    border-radius: 14px;
-    background: rgba(15, 23, 42, 0.6);
-    margin-top: 60px;
+    padding: 40px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    margin-top: 70px;
 }
 .feedback-title {
     color: #ffffff !important;
-    font-size: 20px !important;
-    font-weight: 800 !important;
-    margin-bottom: 10px;
+    font-size: 16px !important;
+    font-weight: 600 !important;
 }
 
 #MainMenu {visibility: hidden;}
@@ -184,41 +171,37 @@ header {visibility: hidden;}
 st.markdown(ui_styles, unsafe_allow_html=True)
 
 # =========================================================
-# GENERATE DYNAMIC LIVE TIMESTAMP (DEUTSCH)
+# LIVE ZEITSTEMPEL
 # =========================================================
 jetzt_de = datetime.now().strftime("%d.%m.%Y - %H:%M:%S")
 
 # =========================================================
-# BRAND HEADER
+# SHIMMER BRAND HEADER
 # =========================================================
 header_html = f"""
 <div class="brand-header">
-    <div class="main-title">
-        ZDFheute <span class="orange-glow-text">🧡</span> ZDF Digital <span style="color:rgba(255,255,255,0.15); font-weight:300; margin:0 12px;">|</span> WhatsApp Artikel-Checker
+    <div class="shimmer-title">
+        ZDFheute 🧡 ZDF Digital <span style="color:rgba(255,255,255,0.15); font-weight:300; margin:0 8px;">|</span> WhatsApp Artikel-Checker
     </div>
-    <div style="text-align: right; font-size: 12px; color: #94a3b8; font-weight: 700; letter-spacing: 0.5px;">
-        <span class="live-dot"></span>STATUS: <span style="color: #ff5a00;">LIVE-DATEN AKTIV</span><br>
-        <span style="color: #64748b; font-weight: 500;">{jetzt_de}</span>
+    <div style="text-align: right; font-size: 11px; color: #475569; font-weight: 600; letter-spacing: 0.5px;">
+        <span class="live-dot-de"></span><span style="color: #64748b;">LIVE-DATEN AKTIV</span><br>
+        <span style="color: #475569; font-weight: 500; display:block; margin-top:2px;">{jetzt_de}</span>
     </div>
 </div>
 """
 st.markdown(header_html, unsafe_allow_html=True)
 
 # =========================================================
-# ERKLÄRUNGSTEXT
+# ERKLÄRUNGSTEXT (SUBTIL & CLEAN)
 # =========================================================
 st.markdown("""
-<div style="background: rgba(30, 41, 59, 0.4); border-left: 4px solid #ff5a00; border-radius: 8px; padding: 18px; margin-bottom: 40px;">
-    <span style="color: #e2e8f0; font-size: 15px;">
-        Dieses Tool analysiert ZDFheute-Artikel im gewählten Zeitraum, vergleicht sie mit einer 
-        Excel-Liste der Artikel, die auf dem WhatsApp-Kanal der ZDFheute liefen (anhand der piano-Excel-Datei) 
-        und zeigt dir nur die Inhalte, die noch nicht im WhatsApp-Kanal veröffentlicht wurden.
-    </span>
+<div style="padding: 0 0 20px 0; color: #64748b !important; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px;">
+    Gegenabgleich der aktuellen ZDFheute-Artikel mit deiner exportierten Piano-Excel-Liste der bereits bespielten WhatsApp-Inhalte.
 </div>
 """, unsafe_allow_html=True)
 
 # =========================================================
-# KONTROLL-PANEL
+# KONTROLL-PANEL MATRIZ
 # =========================================================
 col_file, col_d1, col_d2 = st.columns([2, 1, 1])
 
@@ -371,10 +354,10 @@ if file:
 
     total_missing = sum(len(v) for v in grouped.values())
     
-    # Der neue, ultra-fokussierte Centerpiece KPI-Block
+    # Der schimmernde, puristische KPI Text-Block
     st.markdown(f"""
-    <div class="center-kpi-box">
-        <div class="kpi-massive-number">Fehlende Artikel: {total_missing}</div>
+    <div class="clean-kpi-container">
+        <div class="kpi-shimmer-number">Fehlende Artikel: {total_missing}</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -383,7 +366,7 @@ if file:
         items = grouped[cat]
         if len(items) > 0:
             has_results = True
-            st.markdown(f'<div class="section-headline">{cat} ({len(items)})</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="section-headline">{cat} // {len(items)}</div>', unsafe_allow_html=True)
             for item in items:
                 headline = item['title'].replace('"', '&quot;')
                 url = item['url']
@@ -395,12 +378,13 @@ if file:
                 """, unsafe_allow_html=True)
                 
     if not has_results:
-        st.markdown('<div style="color:#2ed573; font-weight:600; padding:25px; background:rgba(46,213,115,0.05); border:1px solid #2ed573; border-radius:10px; text-align:center;">✔ Perfekt! Alle Artikel sind bereits im WhatsApp-Kanal vorhanden.</div>', unsafe_allow_html=True)
+        st.markdown('<div style="color:#2ed573; font-size:14px; font-weight:500; padding:20px 0;">✔ Alle Artikel wurden bereits über den WhatsApp-Kanal ausgespielt.</div>', unsafe_allow_html=True)
 
 else:
+    # Minimalistischer Footer im Wartezustand
     st.markdown("""
     <div class="feedback-box">
-        <div class="feedback-title">Du hast Feedback oder dir ist etwas aufgefallen? <span style="color:#ff5a00; filter: drop-shadow(0 0 6px #ff5a00);">🧡</span></div>
-        <div class="feedback-text">Schreibe oder schicke deine Anmerkungen jederzeit direkt an <strong>Matthias Schmickl</strong>.</div>
+        <div class="feedback-title">Du hast Feedback oder dir ist etwas aufgefallen? <span style="color:#ff5a00;">🧡</span></div>
+        <div class="feedback-text" style="margin-top:6px; font-size:13px !important;">Schreibe deine Anmerkungen jederzeit direkt an <strong>Matthias Schmickl</strong>.</div>
     </div>
     """, unsafe_allow_html=True)
