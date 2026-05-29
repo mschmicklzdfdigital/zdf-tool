@@ -26,7 +26,6 @@ ui_styles = """
     color: #ffffff !important;
     font-family: 'Inter', sans-serif !important;
 }
-/* Maximale Lesbarkeit für alle Basistexte */
 p, li, span, label, .stMarkdown {
     color: #f1f5f9 !important;
     font-size: 15px !important;
@@ -58,7 +57,6 @@ p, li, span, label, .stMarkdown {
     color: #e2e8f0 !important;
 }
 
-/* HIGH-VISIBILITY UPLOAD BUTTON FIX */
 [data-testid="stFileUploader"] {
     background-color: #1e293b !important;
     border: 2px dashed #ff5a00 !important;
@@ -105,7 +103,6 @@ p, li, span, label, .stMarkdown {
     text-decoration: underline;
 }
 
-/* FEEDBACK AREA BOX */
 .feedback-box {
     text-align: center;
     padding: 40px;
@@ -133,7 +130,7 @@ header {visibility: hidden;}
 st.markdown(ui_styles, unsafe_allow_html=True)
 
 # =========================================================
-# NEW TEXT-BASED BRAND HEADER
+# BRAND HEADER
 # =========================================================
 header_html = """
 <div class="brand-header">
@@ -142,7 +139,7 @@ header_html = """
     </div>
     <div style="text-align: right; font-size: 11px; color: #94a3b8; font-weight: 600;">
         SYSTEMSTATUS: <span style="color: #2ed573;">● LIVE</span><br>
-        REVISION: 2026.10
+        REVISION: 2026.11
     </div>
 </div>
 """
@@ -162,7 +159,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =========================================================
-# KONTROLL-PANEL (MAX VISIBILITY UPLOAD)
+# KONTROLL-PANEL
 # =========================================================
 col_file, col_d1, col_d2 = st.columns([2, 1, 1])
 
@@ -214,6 +211,41 @@ def categorize(title, url):
     t = title.lower().strip()
     u = url.lower().strip()
 
+    # PRIORITÄT 1: Wetter & Unwetter (strikt in Service / Gut zu wissen)
+    if "wetter" in t or "gewitter" in t or "hitzewelle" in t or "unwetter" in t or "regen" in t:
+        return "Gut zu wissen"
+
+    # PRIORITÄT 2: Trends, Pop & Kurioses (Promis fangen vor Politik ab!)
+    pop_keywords = [
+        "promi", "star", "heidi", "helene", "klum", "fischer", "lindenberg", "sänger", 
+        "schauspieler", "musik", "film", "serie", "show", "kino", "festival", "tiktok", 
+        "instagram", "viral", "kurios", "wunder", "hype", "popstar", "bühne", "oscar"
+    ]
+    if "zdfheute.de/panorama/prominente" in u or any(x in t for x in pop_keywords):
+        return "Trends, Pop & Kurioses"
+
+    # PRIORITÄT 3: Zwischen Tat und Aufklärung (Kriminalität)
+    crime_keywords = [
+        "mord", "tat", "gericht", "polizei", "kriminal", "prozess", "anklage", "festnahme", 
+        "ermittlung", "fahndung", "raub", "diebstahl", "schüsse", "toter", "leiche", "opfer", 
+        "täter", "haftbefehl", "sek", "clan", "drogen", "betrug", "jva", "gefängnis"
+    ]
+    if any(x in t for x in crime_keywords):
+        return "Zwischen Tat und Aufklärung"
+
+    # PRIORITÄT 4: Gut zu wissen (Klassischer Service)
+    if "zdfheute.de/ratgeber" in u:
+        return "Gut zu wissen"
+    
+    service_keywords = [
+        "essen", "rezept", "ernährung", "gesundheit", "geld", "steuer", "miete", "rente", 
+        "tipps", "haushalt", "verbraucher", "krankenkasse", "gehalt", "sparen", "energie", 
+        "heizung", "urlaub", "reisen", "medizin", "arzt", "verkehr", "bahn"
+    ]
+    if any(x in t for x in service_keywords):
+        return "Gut zu wissen"
+
+    # PRIORITÄT 5: Macht und Folgen (Politik & Weltgeschehen)
     if "zdfheute.de/politik" in u or "zdf.de/politik" in u:
         return "Macht und Folgen"
         
@@ -226,36 +258,7 @@ def categorize(title, url):
     if any(x in t for x in analysis_keywords):
         return "Macht und Folgen"
 
-    if "zdfheute.de/ratgeber" in u or "zdf.de/ratgeber" in u:
-        return "Gut zu wissen"
-    
-    service_keywords = [
-        "essen", "rezept", "ernährung", "gesundheit", "geld", "steuer", "miete", "rente", 
-        "tipps", "haushalt", "verbraucher", "krankenkasse", "gehalt", "sparen", "energie", 
-        "heizung", "urlaub", "reisen", "medizin", "arzt", "wetter", "verkehr", "bahn"
-    ]
-    if any(x in t for x in service_keywords):
-        return "Gut zu wissen"
-
-    crime_keywords = [
-        "mord", "tat", "gericht", "polizei", "kriminal", "prozess", "anklage", "festnahme", 
-        "ermittlung", "fahndung", "raub", "diebstahl", "schüsse", "toter", "leiche", "opfer", 
-        "täter", "haftbefehl", "sek", "clan", "drogen", "betrug", "jva", "gefängnis"
-    ]
-    if any(x in t for x in crime_keywords):
-        return "Zwischen Tat und Aufklärung"
-
-    if "zdfheute.de/panorama" in u or "zdf.de/panorama" in u:
-        return "Trends, Pop & Kurioses"
-        
-    pop_keywords = [
-        "promi", "star", "heidi", "helene", "klum", "fischer", "lindenberg", "sänger", 
-        "schauspieler", "musik", "film", "serie", "show", "kino", "festival", "tiktok", 
-        "instagram", "viral", "kurios", "wunder", "hype", "popstar", "bühne", "oscar"
-    ]
-    if any(x in t for x in pop_keywords):
-        return "Trends, Pop & Kurioses"
-
+    # Fallback für alles andere
     return "Sonstige Artikel"
 
 # =========================================================
@@ -379,7 +382,6 @@ if file:
         st.markdown('<div style="color:#2ed573; font-weight:600; padding:20px; background:rgba(46,213,115,0.1); border-radius:6px;">✔ Alle Artikel wurden bereits auf WhatsApp geteilt.</div>', unsafe_allow_html=True)
 
 else:
-    # Der neue, maßgeschneiderte Feedback-Footer
     st.markdown("""
     <div class="feedback-box">
         <div class="feedback-title">Du hast Feedback oder dir ist etwas aufgefallen? <span style="color:#ff5a00;">🧡</span></div>
