@@ -281,10 +281,16 @@ start_datetime = datetime.combine(start_date, datetime.min.time())
 end_datetime = datetime.combine(end_date, datetime.max.time())
 
 # =========================================================
-# EXCLUSION ENGINE & VALIDATOR
+# EXCLUSION ENGINE & VALIDATOR (INKL. AUSSCHLUSS-FILTERN)
 # =========================================================
 def should_filter_out(url):
     u = url.lower().strip()
+    
+    # Neu angeforderte Ausschlüsse (Presseportal & Newsticker)
+    if "presseportal.zdf.de" in u: return True
+    if "zdfheute.de/newsticker/" in u: return True
+    
+    # Bestehende Ausschlüsse
     if "zdf.de/dokumentation" in u or "zdf.de/dokus" in u: return True
     if "lottozahlen.zdf.de" in u: return True
     if "zdf.de/video" in u or "zdfheute.de/video" in u or "/video/" in u: return True
