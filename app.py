@@ -108,4 +108,51 @@ p, li, span, label, .stMarkdown {
     font-size: 38px !important;
     font-weight: 800;
     letter-spacing: -1px;
-    background: linear-gradient(90deg, #ff5a00 0%, #ff9e66 50%, #ff5a00 100
+    background: linear-gradient(90deg, #ff5a00 0%, #ff9e66 50%, #ff5a00 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 5s linear infinite;
+}
+
+.section-headline {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    color: #64748b !important;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin: 40px 0 15px 0;
+}
+
+.news-card {
+    background: #0d111c;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    border-radius: 6px;
+    padding: 20px;
+    margin-bottom: 12px;
+    transition: all 0.2s ease;
+}
+.news-card:hover {
+    border-color: rgba(255, 90, 0, 0.3);
+    transform: translateY(-1px);
+}
+.news-headline {
+    font-size: 17px !important;
+    font-weight: 600 !important;
+    color: #ffffff !important;
+    margin-bottom: 6px;
+}
+.news-url-anchor {
+    font-size: 13px !important;
+    color: #64748b !important;
+    text-decoration: none;
+}
+.news-card:hover .news-url-anchor {
+    color: #ff9e66 !important;
+}
+
+.feedback-box {
+    text-align: center;
+    padding: 40px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    margin-top: 80px;
