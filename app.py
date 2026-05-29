@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, date
 
 # =========================================================
-# PAGE CONFIGURATION (ULTRA PREMIUM & CLEAN)
+# PAGE CONFIGURATION (PIKFEIN & PROFESSIONAL)
 # =========================================================
 st.set_page_config(
     page_title="ZDFheute | WhatsApp Intelligence Hub",
@@ -15,20 +15,17 @@ st.set_page_config(
 )
 
 # =========================================================
-# NEXT-GEN 2026 CYBER SLATE & BRAND CORAL THEME
+# NEXT-GEN CYBER SLATE & BRAND CORAL THEME (STRICT SYNTAX)
 # =========================================================
-st.markdown("""
+ui_styles = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-/* Global Reset & Base Theme */
 .stApp {
-    background: radial-gradient(circle at 50% 0%, #0d1527 0%, #050810 100%);
-    color: #f8fafc;
-    font-family: 'Inter', -apple-system, sans-serif;
+    background: radial-gradient(circle at 50% 0%, #0d1527 0%, #050810 100%) !important;
+    color: #f8fafc !important;
+    font-family: 'Inter', -apple-system, sans-serif !important;
 }
-
-/* Brand Header Grid */
 .brand-header {
     display: flex;
     justify-content: space-between;
@@ -37,24 +34,20 @@ st.markdown("""
     border-bottom: 1px solid rgba(255, 90, 0, 0.15);
     margin-bottom: 35px;
 }
-
 .brand-logos-left {
     display: flex;
     align-items: center;
     gap: 20px;
 }
-
 .brand-divider {
     width: 1px;
     height: 35px;
     background: rgba(255, 255, 255, 0.15);
 }
-
 .title-block {
     display: flex;
     flex-direction: column;
 }
-
 .main-title {
     font-size: 28px;
     font-weight: 700;
@@ -63,7 +56,6 @@ st.markdown("""
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
-
 .meta-subtitle {
     font-size: 11px;
     color: #64748b;
@@ -72,8 +64,6 @@ st.markdown("""
     font-weight: 600;
     margin-top: 2px;
 }
-
-/* Glassmorphic Info Wrapper */
 .premium-info-wrapper {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
     border: 1px solid rgba(255, 255, 255, 0.05);
@@ -84,64 +74,8 @@ st.markdown("""
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
     backdrop-filter: blur(12px);
 }
-
 .premium-info-text {
     font-size: 15px;
     line-height: 1.6;
     color: #cbd5e1;
-    font-weight: 400;
-}
-
-/* Category Headers with Sleek Glow */
-.section-headline {
-    font-size: 17px;
-    font-weight: 600;
-    color: #ffffff;
-    margin: 35px 0 15px 0;
-    padding-left: 12px;
-    border-left: 3px solid #ff5a00;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-/* Advanced Article Minimalist Cards */
-.news-card {
-    background: rgba(13, 22, 41, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 14px;
-    backdrop-filter: blur(20px);
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.news-card:hover {
-    border: 1px solid rgba(255, 90, 0, 0.4);
-    background: linear-gradient(90deg, rgba(255, 90, 0, 0.03) 0%, rgba(13, 22, 41, 0.6) 100%);
-    transform: translateX(4px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-}
-
-.news-headline {
-    font-size: 16px;
-    font-weight: 600;
-    color: #ffffff;
-    margin-bottom: 8px;
-    line-height: 1.45;
-}
-
-.news-url-anchor {
-    font-size: 12px;
-    color: #ff5a00;
-    text-decoration: none;
-    font-weight: 500;
-    word-break: break-all;
-    opacity: 0.85;
-    transition: opacity 0.2s;
-}
-
-.news-url-anchor:hover {
-    opacity: 1;
-    text-decoration: underline;
-}
+    font-weight: 400
