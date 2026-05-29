@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 
 
 # =========================================================
-# HEADER
+# HEADER (FINAL)
 # =========================================================
 st.title("ZDFheute Whatsapp Artikel-Checker")
 st.caption("by ZDF Digital News-Redaktion")
@@ -16,7 +16,7 @@ Dieses Tool vergleicht eine Excel-Datei mit den im definierten Zeitraum veröffe
 
 
 # =========================================================
-# HARTE EXKLUSION (IMMER ZUERST!)
+# HARTE EXKLUSION (ABSOLUT VERBINDLICH)
 # =========================================================
 BLOCK_PREFIXES = [
     "https://www.zdfheute.de/briefing",
@@ -25,12 +25,24 @@ BLOCK_PREFIXES = [
     "https://www.zdfheute.de/video",
     "https://www.phoenix.de",
     "https://presseportal.zdf.de/pressemitteilungen",
-    "https://www.zdf.de/dokus"
+    "https://www.zdf.de/dokus",
+    "https://www.zdfheute.de/video",
 ]
 
 
 # =========================================================
-# CATEGORY ENGINE (PRIORITY BASED)
+# KATEGORIEN
+# =========================================================
+C_POLITICS = "Macht und Folgen"
+C_SERVICE = "Service & Alltag"
+C_CRIME = "Zwischen Tat und Aufklärung"
+C_ENTERTAINMENT = "Trends & Unterhaltung"
+C_SOCIAL = "Gesellschaft & Alltag"
+C_OTHER = "Sonstiges"
+
+
+# =========================================================
+# KATEGORISIERUNG (FINAL VERSION)
 # =========================================================
 def categorize(title, url):
 
@@ -41,56 +53,74 @@ def categorize(title, url):
     if any(u.startswith(x) for x in BLOCK_PREFIXES):
         return None
 
-    # 2. URL PRIORITY
+    # 2. URL PRIORITY RULES
     if "/politik" in u:
-        return "Macht und Folgen"
+        return C_POLITICS
 
     if "/ratgeber" in u:
-        return "Service & Alltag"
+        return C_SERVICE
 
-    # 3. PANORAMA SPECIAL CASE
+    # 3. PANORAMA (WICHTIGSTER FIX)
     if "/panorama" in u:
 
-        entertainment_keywords = [
-            "star","stars","promi","show","musik","film","serie",
-            "tv","fernsehen","konzert","mode","fashion","viral",
-            "instagram","tiktok","comeback","sänger","schauspieler"
-        ]
+        # Crime / Events
+        if any(x in t for x in [
+            "unfall","explosion","feuer","rettung","mord",
+            "polizei","tat","anschlag","ermittlung","kriminalität"
+        ]):
+            return C_CRIME
 
-        if any(x in t for x in entertainment_keywords):
-            return "Trends & Unterhaltung"
+        # Service-like Panorama
+        if any(x in t for x in [
+            "gesundheit","hitze","wetter","tipps","ernährung",
+            "geld","kosten","energie"
+        ]):
+            return C_SERVICE
 
-        return "Gesellschaft & Alltag"
+        # Entertainment / Promi / Popkultur
+        if any(x in t for x in [
+            "promi","star","stars","musik","film","serie",
+            "tv","show","konzert","instagram","tiktok",
+            "viral","trend","mode","fashion","sänger","schauspieler"
+        ]):
+            return C_ENTERTAINMENT
 
-    # 4. CRIME
+        # Default Panorama
+        return C_SOCIAL
+
+    # 4. CRIME GLOBAL
     if any(x in t for x in [
         "polizei","gericht","mord","tat","verbrechen",
-        "prozess","urteil","ermittlung","anschlag"
+        "prozess","urteil","ermittlung","anschlag","raub"
     ]):
-        return "Zwischen Tat und Aufklärung"
+        return C_CRIME
 
-    # 5. SERVICE KEYWORDS
+    # 5. SERVICE GLOBAL
     if any(x in t for x in [
-        "essen","rezept","ernährung","kochen","haushalt","gesundheit",
-        "geld","steuer","rente","miete","verbraucher"
+        "rezept","kochen","ernährung","gesundheit","arzt",
+        "geld","steuer","rente","miete","verbraucher",
+        "versicherung","energie","kosten","spar"
     ]):
-        return "Service & Alltag"
+        return C_SERVICE
 
-    # 6. POLITICS KEYWORDS
+    # 6. POLITICS GLOBAL
     if any(x in t for x in [
-        "politik","regierung","bundestag","wahl","krieg",
-        "eu","usa","russland","china","analyse","einordnung"
+        "politik","regierung","bundestag","wahl","eu","usa",
+        "russland","china","krieg","konflikt","nato",
+        "analyse","einordnung","diplomatie"
     ]):
-        return "Macht und Folgen"
+        return C_POLITICS
 
-    # 7. ENTERTAINMENT FALLBACK
+    # 7. ENTERTAINMENT GLOBAL
     if any(x in t for x in [
-        "promi","star","show","film","serie","musik",
-        "tv","viral","trend","social","tiktok","instagram"
+        "promi","star","musik","film","serie","tv",
+        "show","konzert","instagram","tiktok","viral",
+        "trend","mode","fashion"
     ]):
-        return "Trends & Unterhaltung"
+        return C_ENTERTAINMENT
 
-    return "Sonstiges"
+    # 8. FALLBACK (WICHTIG: NICHT VERLIEREN)
+    return C_SOCIAL
 
 
 # =========================================================
@@ -178,20 +208,18 @@ if file:
 
 
     order = [
-        "Macht und Folgen",
-        "Service & Alltag",
-        "Zwischen Tat und Aufklärung",
-        "Trends & Unterhaltung",
-        "Gesellschaft & Alltag",
-        "Sonstiges"
+        C_POLITICS,
+        C_SERVICE,
+        C_CRIME,
+        C_ENTERTAINMENT,
+        C_SOCIAL,
+        C_OTHER
     ]
 
     for cat in order:
-
         items = grouped.get(cat, [])
 
         if items:
-
             st.subheader(cat)
 
             for a in items:
