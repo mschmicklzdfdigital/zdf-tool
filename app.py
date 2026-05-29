@@ -2,46 +2,104 @@ import streamlit as st
 import pandas as pd
 import requests
 import xml.etree.ElementTree as ET
-from datetime import datetime
 
 
-# -------------------------
-# KATEGORIEN (verbessert)
-# -------------------------
-def categorize(t):
-    t = t.lower()
+# =========================================================
+# KATEGORIEN (verbessert + URL-Logik + saubere Trennung)
+# =========================================================
+def categorize(title, url):
+
+    t = title.lower()
+    u = url.lower()
+
+
+    # =====================================================
+    # ❌ HARTE EXKLUSIONEN (kommen NIE rein)
+    # =====================================================
+
+    blocked_prefixes = [
+        "https://www.zdfheute.de/briefing",
+        "https://www.zdfheute.de/thema",
+        "https://www.zdfheute.de/in-eigener-sache"
+    ]
+
+    if any(u.startswith(b) for b in blocked_prefixes):
+        return None
+
+
+    # =====================================================
+    # SERVICE (URL PRIORITÄT)
+    # =====================================================
+    if u.startswith("https://www.zdfheute.de/ratgeber"):
+        return "Service & Alltag"
+
 
     if any(x in t for x in [
-        "politik","krieg","wahl","regierung","eu","usa","russland",
-        "china","international","analyse","einordnung","gipfel","konflikt"
-    ]):
-        return "Macht und Folgen"
-
-    if any(x in t for x in [
-        "ratgeber","tipps","wissen","erklärt","geld","steuer","rente",
-        "gesundheit","essen","rezept","service","verbraucher","miete",
-        "ernährung","haushalt","shopping"
+        "ratgeber","tipps","wissen","erklärt","hilfe",
+        "essen","rezept","ernährung","haushalt","gesundheit",
+        "geld","steuer","rente","miete","verbraucher"
     ]):
         return "Service & Alltag"
 
+
+    # =====================================================
+    # POLITIK / MACHT / INTERNATIONAL
+    # =====================================================
+    if u.startswith("https://www.zdfheute.de/politik"):
+        return "Macht und Folgen"
+
+
     if any(x in t for x in [
-        "polizei","tat","mord","gericht","prozess","verbrechen",
-        "ermittlung","täter","opfer","unfall","kriminal"
+        "politik","regierung","bundestag","wahl","gesetz",
+        "eu","usa","russland","china","krieg","konflikt",
+        "international","analyse","einordnung","diplomatie"
+    ]):
+        return "Macht und Folgen"
+
+
+    # =====================================================
+    # PANORAMA = NICHT POLITIK (wichtig korrigiert)
+    # =====================================================
+    if u.startswith("https://www.zdfheute.de/panorama"):
+        return "Gesellschaft & Alltag"
+
+
+    if any(x in t for x in [
+        "unfall","feuer","rettung","polizei","kriminalität",
+        "gericht","mord","tat","verbrechen"
+    ]):
+        return "Gesellschaft & Alltag"
+
+
+    # =====================================================
+    # TAT / KRIMINALFÄLLE (tiefer spezialisiert)
+    # =====================================================
+    if any(x in t for x in [
+        "ermittlung","täter","opfer","prozess","urteil",
+        "anschlag","festnahme"
     ]):
         return "Zwischen Tat und Aufklärung"
 
+
+    # =====================================================
+    # TREND / ENTERTAINMENT
+    # =====================================================
     if any(x in t for x in [
-        "trend","viral","tiktok","promi","show","musik","social",
-        "internet","kino","serie","kurios","stars"
+        "trend","viral","tiktok","promi","show","musik",
+        "serie","film","kino","social","kurios"
     ]):
         return "Trends & Unterhaltung"
 
+
+    # =====================================================
+    # FALLBACK
+    # =====================================================
     return "Sonstiges"
 
 
-# -------------------------
+# =========================================================
 # DATENQUELLE
-# -------------------------
+# =========================================================
 @st.cache_data(ttl=600)
 def get_articles():
 
@@ -54,15 +112,6 @@ def get_articles():
     ]
 
     articles = []
-
-    blocked_prefixes = [
-        "https://www.phoenix.de",          # ❌ PHOENIX KOMPLETT RAUS
-        "https://www.zdf.de/video",        # ❌ Video raus
-        "https://www.zdf.de/thema/",       # ❌ Themenseiten
-        "https://www.zdf.de/newsticker/",
-        "https://www.zdf.de/in-eigener-sache/",
-        "https://www.zdf.de/sender/"
-    ]
 
     for feed in feeds:
 
@@ -81,16 +130,24 @@ def get_articles():
                 title = title_el.text.strip()
                 link = link_el.text.strip()
 
-                # ❌ PHOENIX + BLOCKLIST
-                if any(link.startswith(b) for b in blocked_prefixes):
+                u = link.lower()
+
+                # =================================================
+                # ❌ HARTE EXKLUSIONEN
+                # =================================================
+                if any(u.startswith(b) for b in [
+                    "https://www.zdfheute.de/briefing",
+                    "https://www.zdfheute.de/thema",
+                    "https://www.zdfheute.de/in-eigener-sache"
+                ]):
                     continue
 
-                # ❌ Video raus
-                if "video" in link or "video" in title.lower():
+                # ❌ Videos raus
+                if "video" in u:
                     continue
 
-                # ❌ offensichtliche Hubs
-                if link.count("/") <= 3:
+                # ❌ reine Navigationsseiten
+                if u.count("/") <= 3:
                     continue
 
                 articles.append({
@@ -104,17 +161,17 @@ def get_articles():
     return articles
 
 
-# -------------------------
+# =========================================================
 # UI
-# -------------------------
-st.title("ZDFheute + Excel Abgleich Tool")
+# =========================================================
+st.title("ZDFheute Excel Abgleich Tool (Final Clean Version)")
 
 file = st.file_uploader("Excel hochladen (erste Spalte = Titel)")
 
 
-# -------------------------
+# =========================================================
 # MAIN
-# -------------------------
+# =========================================================
 if file:
 
     df = pd.read_excel(file, engine="openpyxl")
@@ -136,23 +193,23 @@ if file:
             continue
         seen.add(title)
 
-        # ❌ schon in Excel
         if title in excel_titles:
             continue
 
-        cat = categorize(title)
+        cat = categorize(a["title"], a["url"])
 
-        if cat not in grouped:
-            grouped[cat] = []
+        if not cat:
+            continue
 
-        grouped[cat].append(a)
+        grouped.setdefault(cat, []).append(a)
 
 
-    # -------------------------
+    # =====================================================
     # OUTPUT
-    # -------------------------
+    # =====================================================
     order = [
         "Macht und Folgen",
+        "Gesellschaft & Alltag",
         "Service & Alltag",
         "Zwischen Tat und Aufklärung",
         "Trends & Unterhaltung",
@@ -164,6 +221,7 @@ if file:
         items = grouped.get(cat, [])
 
         if items:
+
             st.subheader(cat)
 
             for a in items:
