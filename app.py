@@ -76,27 +76,16 @@ p, li, span, label, .stMarkdown {
     vertical-align: middle;
 }
 
-/* Ausführliche Infobox */
+/* Einzeilige, noble Infobox */
 .editorial-info-box {
     background: #0d111c;
     border-left: 3px solid #ff5a00;
-    padding: 22px;
+    padding: 16px 20px;
     border-radius: 0 8px 8px 0;
     margin-bottom: 35px;
-}
-.info-headline {
-    color: #ffffff !important;
-    font-weight: 700 !important;
-    font-size: 16px !important;
-    margin-bottom: 8px;
-}
-.info-list {
-    margin-top: 10px;
-    padding-left: 20px;
-}
-.info-list li {
-    font-size: 14px !important;
-    margin-bottom: 6px;
+    font-size: 14.5px;
+    color: #cbd5e1 !important;
+    line-height: 1.5;
 }
 
 /* Cleaner, kontrastreicher FileUploader */
@@ -193,40 +182,45 @@ header {visibility: hidden;}
 st.markdown(ui_styles, unsafe_allow_html=True)
 
 # =========================================================
-# LIVE ZEITSTEMPEL (DEUTSCH)
+# SHIMMER BRAND HEADER WITH AUTOMATIC JS-CLOCK
 # =========================================================
-jetzt_de = datetime.now().strftime("%d.%m.%Y - %H:%M:%S")
-
-# =========================================================
-# SHIMMER BRAND HEADER
-# =========================================================
-header_html = f"""
+header_html = """
 <div class="brand-header">
     <div class="shimmer-title">
         ZDFheute 🧡 ZDF Digital <span style="color:rgba(255,255,255,0.15); font-weight:300; margin:0 8px;">|</span> WhatsApp Artikel-Checker
     </div>
     <div style="text-align: right; font-size: 11px; color: #475569; font-weight: 600; letter-spacing: 0.5px;">
         <span class="live-dot-de"></span><span style="color: #64748b;">LIVE-DATEN AKTIV</span><br>
-        <span style="color: #475569; font-weight: 500; display:block; margin-top:2px;">{jetzt_de}</span>
+        <span id="live-ticker-2026" style="color: #475569; font-weight: 500; display:block; margin-top:2px; font-variant-numeric: tabular-nums;">--.--.---- - --:--:--</span>
     </div>
 </div>
+
+<script>
+function updateClock() {
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    
+    const timeString = `${day}.${month}.${year} - ${hours}:${minutes}:${seconds}`;
+    const el = document.getElementById('live-ticker-2026');
+    if (el) { el.innerHTML = timeString; }
+}
+setInterval(updateClock, 1000);
+updateClock();
+</script>
 """
 st.markdown(header_html, unsafe_allow_html=True)
 
 # =========================================================
-# AUSFÜHRLICHE FUNKTIONSBESCHREIBUNG (DAUERHAFT SICHTBAR)
+# DER ANGEPASSTE, EINZEILIGE ERKLÄRUNGSTEXT
 # =========================================================
 st.markdown("""
 <div class="editorial-info-box">
-    <div class="info-headline">System-Logik & Funktionsweise:</div>
-    <div style="font-size: 14.5px; color: #cbd5e1 !important; line-height: 1.6;">
-        Dieses Tool automatisiert den Abgleich zwischen aktuell auf der Website publizierten Inhalten und den bereits über WhatsApp distribuierten Artikeln. Ziel ist es, Lücken in der Distribution sofort zu identifizieren.
-    </div>
-    <ul class="info-list">
-        <li><strong>Echtzeit-Vergleich:</strong> Das Tool ruft die neuesten Artikel direkt über die offiziellen ZDFheute-RSS-Feeds ab und gleicht Überschriften sowie URLs rigoros gegen die hochgeladene Piano-Excel-Liste ab.</li>
-        <li><strong>Automatische Filterung:</strong> Formate, die systembedingt nicht für klassische WhatsApp-Text-Pushes infrage kommen (darunter Dokumentationen, Mediathek-Videos, Lottozahlen, Briefings, Themenseiten sowie Phoenix-Inhalte), werden automatisch aussortiert.</li>
-        <li><strong>Präzise Kategorisierung (2026 Update):</strong> Die Sortierung erfolgt über ein intelligentes Prioritäten-Matching. Dadurch werden beispielsweise Unwetterwarnungen und Wetterberichte treffsicher in <em>"Gut zu wissen"</em> einsortiert und prominente Personen (z. B. Helene Fischer) landen sicher in <em>"Trends, Pop & Kurioses"</em>, anstatt fälschlicherweise der Politik zugeordnet zu werden.</li>
-    </ul>
+    Dieses Tool filtert automatisch alle für Messenger irrelevanten Inhalte von ZDFheute heraus, sodass im Abgleich mit deiner Piano-Excel-Liste präzise nur noch jene Artikel erscheinen, die bisher noch nicht auf dem WhatsApp-Kanal von ZDFheute veröffentlicht wurden.
 </div>
 """, unsafe_allow_html=True)
 
@@ -274,11 +268,9 @@ def categorize(title, url):
     t = title.lower().strip()
     u = url.lower().strip()
 
-    # PRIORITÄT 1: Wetter & Unwetter (strikt in Service)
     if "wetter" in t or "gewitter" in t or "hitzewelle" in t or "unwetter" in t or "regen" in t:
         return "Gut zu wissen"
 
-    # PRIORITÄT 2: Trends, Pop & Kurioses (Fängt Promis ab)
     pop_keywords = [
         "promi", "star", "heidi", "helene", "klum", "fischer", "lindenberg", "sänger", 
         "schauspieler", "musik", "film", "serie", "show", "kino", "festival", "tiktok", 
@@ -287,7 +279,6 @@ def categorize(title, url):
     if "zdfheute.de/panorama/prominente" in u or any(x in t for x in pop_keywords):
         return "Trends, Pop & Kurioses"
 
-    # PRIORITÄT 3: Zwischen Tat und Aufklärung (Kriminalität)
     crime_keywords = [
         "mord", "tat", "gericht", "polizei", "kriminal", "prozess", "anklage", "festnahme", 
         "ermittlung", "fahndung", "raub", "diebstahl", "schüsse", "toter", "leiche", "opfer", 
@@ -387,7 +378,6 @@ if file:
 
     total_missing = sum(len(v) for v in grouped.values())
     
-    # Der schimmernde, puristische KPI Text-Block
     st.markdown(f"""
     <div class="clean-kpi-container">
         <div class="kpi-shimmer-number">Fehlende Artikel: {total_missing}</div>
