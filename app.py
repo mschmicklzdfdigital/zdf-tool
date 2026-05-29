@@ -6,12 +6,7 @@ from datetime import datetime
 
 
 # -------------------------
-# STREAMLIT MUSS ALS ERSTES FUNKTIONIEREN
-# -------------------------
-
-
-# -------------------------
-# KATEGORIEN
+# KATEGORIEN (verbessert)
 # -------------------------
 def categorize(t):
     t = t.lower()
@@ -24,19 +19,20 @@ def categorize(t):
 
     if any(x in t for x in [
         "ratgeber","tipps","wissen","erklärt","geld","steuer","rente",
-        "gesundheit","essen","rezept","service","verbraucher","miete"
+        "gesundheit","essen","rezept","service","verbraucher","miete",
+        "ernährung","haushalt","shopping"
     ]):
         return "Service & Alltag"
 
     if any(x in t for x in [
         "polizei","tat","mord","gericht","prozess","verbrechen",
-        "ermittlung","täter","opfer","unfall"
+        "ermittlung","täter","opfer","unfall","kriminal"
     ]):
         return "Zwischen Tat und Aufklärung"
 
     if any(x in t for x in [
         "trend","viral","tiktok","promi","show","musik","social",
-        "internet","kino","serie","kurios"
+        "internet","kino","serie","kurios","stars"
     ]):
         return "Trends & Unterhaltung"
 
@@ -44,7 +40,7 @@ def categorize(t):
 
 
 # -------------------------
-# DATENQUELLE (RSS stabil + vollständig)
+# DATENQUELLE
 # -------------------------
 @st.cache_data(ttl=600)
 def get_articles():
@@ -58,6 +54,15 @@ def get_articles():
     ]
 
     articles = []
+
+    blocked_prefixes = [
+        "https://www.phoenix.de",          # ❌ PHOENIX KOMPLETT RAUS
+        "https://www.zdf.de/video",        # ❌ Video raus
+        "https://www.zdf.de/thema/",       # ❌ Themenseiten
+        "https://www.zdf.de/newsticker/",
+        "https://www.zdf.de/in-eigener-sache/",
+        "https://www.zdf.de/sender/"
+    ]
 
     for feed in feeds:
 
@@ -73,29 +78,19 @@ def get_articles():
                 if title_el is None or link_el is None:
                     continue
 
-                title = title_el.text
-                link = link_el.text
+                title = title_el.text.strip()
+                link = link_el.text.strip()
 
-                if not title or not link:
+                # ❌ PHOENIX + BLOCKLIST
+                if any(link.startswith(b) for b in blocked_prefixes):
                     continue
 
-                title = title.strip()
-                link = link.strip()
-
-                # ❌ VIDEO LINKS RAUS
-                if link.startswith("https://www.zdf.de/video"):
+                # ❌ Video raus
+                if "video" in link or "video" in title.lower():
                     continue
 
-                if "video" in title.lower():
-                    continue
-
-                # ❌ Übersichtsseiten raus
-                blocked_paths = [
-                    "/politik","/wirtschaft","/panorama",
-                    "/sport","/gesundheit","/kultur","/doku"
-                ]
-
-                if any(link.startswith("https://www.zdf.de" + p) for p in blocked_paths):
+                # ❌ offensichtliche Hubs
+                if link.count("/") <= 3:
                     continue
 
                 articles.append({
@@ -112,33 +107,31 @@ def get_articles():
 # -------------------------
 # UI
 # -------------------------
-st.title("ZDFheute Excel Abgleich Tool")
+st.title("ZDFheute + Excel Abgleich Tool")
 
 file = st.file_uploader("Excel hochladen (erste Spalte = Titel)")
 
 
 # -------------------------
-# MAIN LOGIC
+# MAIN
 # -------------------------
 if file:
 
     df = pd.read_excel(file, engine="openpyxl")
 
     excel_titles = set(
-        df.iloc[:, 0].astype(str).str.lower().str.strip()
+        df.iloc[:,0].astype(str).str.lower().str.strip()
     )
 
     articles = get_articles()
 
     grouped = {}
-
     seen = set()
 
     for a in articles:
 
         title = a["title"].lower().strip()
 
-        # Duplikate entfernen
         if title in seen:
             continue
         seen.add(title)
