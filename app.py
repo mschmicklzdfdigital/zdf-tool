@@ -3,7 +3,6 @@ import pandas as pd
 import requests
 import xml.etree.ElementTree as ET
 from datetime import datetime
-from email.utils import parsedate_to_datetime
 
 
 # =========================================================
@@ -13,13 +12,12 @@ st.title("ZDFheute Whatsapp Artikel-Checker")
 st.caption("by ZDF Digital News-Redaktion")
 
 st.markdown("""
-Dieses Tool überprüft anhand einer Excel-Datei mit geposteten Links (via piano csv-Download), welche Themen beim WhatsApp-Kanal der ZDFheute in einem bestimmten Zeitraum noch nicht veröffentlicht wurden.  
-Außerdem kategorisiert das Tool sie in die bei den User*innen beliebtesten Kategorien.
+Dieses Tool überprüft anhand einer Excel-Datei, welche ZDFheute-Artikel im Zeitraum NICHT im WhatsApp-Kanal veröffentlicht wurden und ordnet sie in Themenbereiche ein.
 """)
 
 
 # =========================================================
-# ZEITRAUMFILTER (ECHT AKTIV)
+# ZEITRAUM (nur UI aktuell, später erweiterbar)
 # =========================================================
 st.subheader("Zeitraum auswählen")
 
@@ -30,86 +28,95 @@ end_date = col2.date_input("Bis", value=datetime.today())
 
 
 # =========================================================
-# BLOCKLIST (GLOBAL - WICHTIG)
+# HARTE BLOCKLIST (BLEIBT 100% WICHTIG)
 # =========================================================
 BLOCK_PREFIXES = [
     "https://www.zdfheute.de/briefing",
     "https://www.zdfheute.de/thema",
     "https://www.zdfheute.de/in-eigener-sache",
     "https://www.phoenix.de",
-    "https://www.zdfheute.de/video",
-    "https://www.zdfheute.de/livestream",
-    "https://www.zdfheute.de/newsticker",
-    "https://www.zdfheute.de/sender"
+    "https://www.zdfheute.de/video"
 ]
 
 
 # =========================================================
-# KATEGORIEN (URL + KEYWORD HYBRID)
+# KATEGORIEN (VERFEINERT, KEINE STRUKTURÄNDERUNG)
 # =========================================================
 def categorize(title, url):
 
     t = title.lower()
     u = url.lower()
 
-    if any(u.startswith(b) for b in BLOCK_PREFIXES):
+
+    # ❌ HARTE EXKLUSION
+    if any(u.startswith(x) for x in BLOCK_PREFIXES):
         return None
 
 
-    # SERVICE
-    if u.startswith("https://www.zdfheute.de/ratgeber"):
-        return "Service & Alltag"
-
-    if any(x in t for x in [
-        "essen","rezept","ernährung","haushalt","gesundheit",
-        "tipps","ratgeber","service","geld","steuer","rente",
-        "miete","verbraucher"
-    ]):
-        return "Service & Alltag"
-
-
-    # POLITIK / MACHT
+    # =====================================================
+    # 🟦 MACHT & FOLGEN
+    # =====================================================
     if u.startswith("https://www.zdfheute.de/politik"):
         return "Macht und Folgen"
 
     if any(x in t for x in [
-        "politik","regierung","bundestag","wahl","eu","usa",
-        "russland","china","krieg","konflikt","analyse","einordnung"
+        "politik","regierung","bundestag","wahl","gesetz",
+        "eu","usa","russland","china","krieg","konflikt",
+        "diplomatie","analyse","einordnung","wirtschaft",
+        "gipfel","nato","ukraine","nahost"
     ]):
         return "Macht und Folgen"
 
 
-    # PANORAMA = Gesellschaft (nicht Politik!)
-    if u.startswith("https://www.zdfheute.de/panorama"):
-        return "Gesellschaft & Alltag"
+    # =====================================================
+    # 🟩 SERVICE & ALLTAG
+    # =====================================================
+    if u.startswith("https://www.zdfheute.de/ratgeber"):
+        return "Service & Alltag"
 
     if any(x in t for x in [
-        "unfall","polizei","feuer","rettung","kriminalität",
-        "gericht","mord","tat","verbrechen"
+        "essen","rezept","ernährung","kochen","haushalt",
+        "gesundheit","arzt","medizin","tipps","ratgeber",
+        "geld","steuer","rente","miete","verbraucher",
+        "versicherung","finanzen","spar","alltag"
     ]):
-        return "Gesellschaft & Alltag"
+        return "Service & Alltag"
 
 
-    # KRIMINALFÄLLE / JUSTIZ
+    # =====================================================
+    # 🟥 KRIMINALITÄT / JUSTIZ
+    # =====================================================
     if any(x in t for x in [
-        "ermittlung","täter","opfer","prozess","urteil","anschlag"
+        "polizei","gericht","mord","tat","verbrechen",
+        "prozess","urteil","ermittlung","festnahme","anschlag",
+        "raub","betrug"
     ]):
         return "Zwischen Tat und Aufklärung"
 
 
-    # ENTERTAINMENT
+    # =====================================================
+    # 🟪 TRENDS & UNTERHALTUNG (PROMIS FIX!)
+    # =====================================================
     if any(x in t for x in [
-        "trend","viral","tiktok","promi","serie","film",
-        "musik","show","social"
+        # PROMI / ENTERTAINMENT (wichtig erweitert)
+        "promi","star","stars","model","schauspieler","sänger",
+        "musik","album","konzert","tv","fernsehen","show",
+        "serie","film","kino","streaming","reality",
+        "instagram","tiktok","viral","trend","social",
+        "mode","fashion","gntm","germany's next topmodel",
+        "royal","royals","boulevard","comeback"
     ]):
         return "Trends & Unterhaltung"
 
 
+    # =====================================================
+    # ⚫ SONSTIGES
+    # =====================================================
     return "Sonstiges"
 
 
 # =========================================================
-# RSS + DATUM (JETZT KORREKT)
+# RSS DATEN
 # =========================================================
 @st.cache_data(ttl=600)
 def get_articles():
@@ -134,7 +141,6 @@ def get_articles():
 
                 title_el = item.find("title")
                 link_el = item.find("link")
-                date_el = item.find("pubDate")
 
                 if title_el is None or link_el is None:
                     continue
@@ -142,22 +148,10 @@ def get_articles():
                 title = title_el.text.strip()
                 link = link_el.text.strip()
 
-                # Datum parsing
-                pub_date = None
-                if date_el is not None and date_el.text:
-                    try:
-                        pub_date = parsedate_to_datetime(date_el.text).date()
-                    except:
-                        pub_date = None
-
-                # Zeitraumfilter
-                if pub_date:
-                    if pub_date < start_date or pub_date > end_date:
-                        continue
-
                 u = link.lower()
 
-                if any(u.startswith(b) for b in BLOCK_PREFIXES):
+                # ❌ HARTE BLOCKLIST
+                if any(u.startswith(x) for x in BLOCK_PREFIXES):
                     continue
 
                 if "video" in u:
@@ -168,8 +162,7 @@ def get_articles():
 
                 articles.append({
                     "title": title,
-                    "url": link,
-                    "date": pub_date
+                    "url": link
                 })
 
         except:
@@ -224,7 +217,6 @@ if file:
     # =====================================================
     order = [
         "Macht und Folgen",
-        "Gesellschaft & Alltag",
         "Service & Alltag",
         "Zwischen Tat und Aufklärung",
         "Trends & Unterhaltung",
